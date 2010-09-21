@@ -1,0 +1,4 @@
+*.o
+*.a
+*.dSYM
+ejson_test
