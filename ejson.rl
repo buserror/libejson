@@ -42,7 +42,7 @@ static char * ejson_append_utf8_glyph(
 		*dst++ = ((char)inUnicode);
 		return dst;	// that was easy
 	}
-	unsigned char *cur = dst;
+	unsigned char *cur = (unsigned char*)dst;
 
 	unsigned long currentMask = ~0x7ff;
 	int bits = 6;
@@ -58,7 +58,7 @@ static char * ejson_append_utf8_glyph(
 		*cur++ = 0x80 | ((unsigned char)(inUnicode >> bits) & 0x3f);
 		bits -= 6;
 	}
-	return cur;
+	return (char*)cur;
 }
 
 int ejson_parse_string(const char * str, const char *end, char * out)
@@ -71,9 +71,9 @@ int ejson_parse_string(const char * str, const char *end, char * out)
 		machine ejson_str;
 
 		xxdigit = (
-			([0-9] @{ u = (u << 4) | fc - '0'; }) |
-			([a-f] @{ u = (u << 4) | fc - 'a' + 0xa; }) |
-			([A-F] @{ u = (u << 4) | fc - 'A' + 0xa; })			
+			([0-9] @{ u = (u << 4) | (fc - '0'); }) |
+			([a-f] @{ u = (u << 4) | (fc - 'a' + 0xa); }) |
+			([A-F] @{ u = (u << 4) | (fc - 'A' + 0xa); })			
 		);
 		utf16 = ( xxdigit{4} ) >{ u = 0; } @{ out = ejson_append_utf8_glyph(out, u); };
 		
@@ -87,7 +87,7 @@ int ejson_parse_string(const char * str, const char *end, char * out)
 				('n' %{ *out++ = '\n'; } )  |
 				('r' %{ *out++ = '\r'; } )  |
 				('u' utf16 ) |
-				( normal -- [\\tbfntu\"] )
+				(( any -- [\\tbfntu\"] ) %{*out++ = fc;})
 			;
 		main := (
 			('\\' escape) |
@@ -115,12 +115,14 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 	int stack[48], top = 0;
 	int integer_sign = 0;	// for integer decode
 	const char * float_start = NULL;
-	ejson_driver_value_t v = {0};
+	ejson_driver_value_t v; // = {0};
 	uint32_t b64 = 0;
 	int b64_cnt = 0;
 	uint8_t * base64 = NULL;
 	int base64_hold = 0;
+	const char * _value_start = NULL;
 	
+	memset(&v, 0, sizeof(v));
 	%%{
 		machine ejson;
 		action obj_field_list_start { d->open_object(d); }
@@ -188,9 +190,9 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		# hex integer
 		#
 		xxdigit = (
-			([0-9] @{ v.u.v_int = (v.u.v_int << 4) | fc - '0'; }) |
-			([a-f] @{ v.u.v_int = (v.u.v_int << 4) | fc - 'a' + 0xa; }) |
-			([A-F] @{ v.u.v_int = (v.u.v_int << 4) | fc - 'A' + 0xa; })			
+			([0-9] @{ v.u.v_int = (v.u.v_int << 4) | (fc - '0'); }) |
+			([a-f] @{ v.u.v_int = (v.u.v_int << 4) | (fc - 'a' + 0xa); }) |
+			([A-F] @{ v.u.v_int = (v.u.v_int << 4) | (fc - 'A' + 0xa); })			
 		);
 		hex = (('-' @integer_minus | '+')?( '0x' xxdigit+))
 			>integer_init %integer_done;
@@ -248,8 +250,8 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 			('{' @{ fhold; fcall obj_field_list; } ) |
 			('[' @{ fhold; fcall ejson_value_list; } ) |
 			(('%' (W base64)* W '%') >obj_start_data %obj_end_data)
-		)
-				%err{ printf("### Value[%d] Error : '%s'\n", top, p); };
+		) >{ _value_start = p; }
+				%err{ printf("### Value[%d] Error : '%s'\n", top, _value_start); };
 		
 		ejson_value_list := (
 			'[' W

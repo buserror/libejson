@@ -31,11 +31,11 @@ extern "C" {
  */
 enum {
 	ejson_driver_type_null = 0,
-	ejson_driver_type_bool,
-	ejson_driver_type_integer,
-	ejson_driver_type_hex,
-	ejson_driver_type_float,
-	ejson_driver_type_string
+	ejson_driver_type_bool			= (1 << 0),
+	ejson_driver_type_integer		= (1 << 1),
+	ejson_driver_type_hex			= (1 << 2),
+	ejson_driver_type_float			= (1 << 3),
+	ejson_driver_type_string		= (1 << 4),
 };
 
 /*

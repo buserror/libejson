@@ -35,7 +35,7 @@
 #line 36 "ejson.c"
 static const char _ejson_str_eof_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 11, 
-	13, 15, 17, 19, 21, 23
+	13, 15, 17, 19, 21, 23, 25
 };
 
 static const int ejson_str_start = 6;
@@ -56,7 +56,7 @@ static char * ejson_append_utf8_glyph(
 		*dst++ = ((char)inUnicode);
 		return dst;	// that was easy
 	}
-	unsigned char *cur = dst;
+	unsigned char *cur = (unsigned char*)dst;
 
 	unsigned long currentMask = ~0x7ff;
 	int bits = 6;
@@ -72,7 +72,7 @@ static char * ejson_append_utf8_glyph(
 		*cur++ = 0x80 | ((unsigned char)(inUnicode >> bits) & 0x3f);
 		bits -= 6;
 	}
-	return cur;
+	return (char*)cur;
 }
 
 int ejson_parse_string(const char * str, const char *end, char * out)
@@ -97,8 +97,8 @@ _resume:
 	switch ( cs ) {
 case 6:
 	if ( (*p) == 92 )
-		goto tr22;
-	goto tr0;
+		goto tr23;
+	goto tr22;
 case 1:
 	switch( (*p) ) {
 		case 34: goto tr1;
@@ -113,32 +113,36 @@ case 1:
 	goto tr0;
 case 7:
 	if ( (*p) == 92 )
-		goto tr24;
-	goto tr23;
+		goto tr25;
+	goto tr24;
 case 8:
 	if ( (*p) == 92 )
-		goto tr26;
-	goto tr25;
+		goto tr27;
+	goto tr26;
 case 9:
 	if ( (*p) == 92 )
-		goto tr28;
-	goto tr27;
+		goto tr29;
+	goto tr28;
 case 10:
 	if ( (*p) == 92 )
-		goto tr30;
-	goto tr29;
+		goto tr31;
+	goto tr30;
 case 11:
 	if ( (*p) == 92 )
-		goto tr32;
-	goto tr31;
+		goto tr33;
+	goto tr32;
 case 12:
 	if ( (*p) == 92 )
-		goto tr34;
-	goto tr33;
+		goto tr35;
+	goto tr34;
 case 13:
 	if ( (*p) == 92 )
-		goto tr36;
-	goto tr35;
+		goto tr37;
+	goto tr36;
+case 14:
+	if ( (*p) == 92 )
+		goto tr39;
+	goto tr38;
 case 2:
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
@@ -184,162 +188,179 @@ case 5:
 	}
 
 	tr10: cs = 0; goto _again;
-	tr22: cs = 1; goto _again;
-	tr24: cs = 1; goto f10;
-	tr26: cs = 1; goto f12;
-	tr28: cs = 1; goto f14;
-	tr30: cs = 1; goto f16;
-	tr32: cs = 1; goto f18;
-	tr34: cs = 1; goto f20;
-	tr36: cs = 1; goto f22;
+	tr23: cs = 1; goto _again;
+	tr25: cs = 1; goto f10;
+	tr27: cs = 1; goto f12;
+	tr29: cs = 1; goto f14;
+	tr31: cs = 1; goto f16;
+	tr33: cs = 1; goto f18;
+	tr35: cs = 1; goto f20;
+	tr37: cs = 1; goto f22;
+	tr39: cs = 1; goto f24;
 	tr8: cs = 2; goto _again;
-	tr9: cs = 3; goto f1;
-	tr11: cs = 3; goto f2;
-	tr12: cs = 3; goto f3;
-	tr13: cs = 4; goto f4;
-	tr14: cs = 4; goto f5;
-	tr15: cs = 4; goto f6;
-	tr16: cs = 5; goto f4;
-	tr17: cs = 5; goto f5;
-	tr18: cs = 5; goto f6;
-	tr0: cs = 6; goto f0;
-	tr19: cs = 6; goto f7;
-	tr20: cs = 6; goto f8;
-	tr21: cs = 6; goto f9;
-	tr23: cs = 6; goto f11;
-	tr25: cs = 6; goto f13;
-	tr27: cs = 6; goto f15;
-	tr29: cs = 6; goto f17;
-	tr31: cs = 6; goto f19;
-	tr33: cs = 6; goto f21;
-	tr35: cs = 6; goto f23;
-	tr1: cs = 7; goto _again;
-	tr2: cs = 8; goto _again;
-	tr3: cs = 9; goto _again;
-	tr4: cs = 10; goto _again;
-	tr5: cs = 11; goto _again;
-	tr6: cs = 12; goto f0;
-	tr7: cs = 13; goto _again;
+	tr9: cs = 3; goto f0;
+	tr11: cs = 3; goto f1;
+	tr12: cs = 3; goto f2;
+	tr13: cs = 4; goto f3;
+	tr14: cs = 4; goto f4;
+	tr15: cs = 4; goto f5;
+	tr16: cs = 5; goto f3;
+	tr17: cs = 5; goto f4;
+	tr18: cs = 5; goto f5;
+	tr19: cs = 6; goto f6;
+	tr20: cs = 6; goto f7;
+	tr21: cs = 6; goto f8;
+	tr22: cs = 6; goto f9;
+	tr24: cs = 6; goto f11;
+	tr26: cs = 6; goto f13;
+	tr28: cs = 6; goto f15;
+	tr30: cs = 6; goto f17;
+	tr32: cs = 6; goto f19;
+	tr34: cs = 6; goto f21;
+	tr36: cs = 6; goto f23;
+	tr38: cs = 6; goto f25;
+	tr0: cs = 7; goto _again;
+	tr1: cs = 8; goto _again;
+	tr2: cs = 9; goto _again;
+	tr3: cs = 10; goto _again;
+	tr4: cs = 11; goto _again;
+	tr5: cs = 12; goto _again;
+	tr6: cs = 13; goto _again;
+	tr7: cs = 14; goto _again;
 
-f4:
+f3:
 #line 74 "ejson.rl"
-	{ u = (u << 4) | (*p) - '0'; }
-	goto _again;
-f6:
-#line 75 "ejson.rl"
-	{ u = (u << 4) | (*p) - 'a' + 0xa; }
+	{ u = (u << 4) | ((*p) - '0'); }
 	goto _again;
 f5:
-#line 76 "ejson.rl"
-	{ u = (u << 4) | (*p) - 'A' + 0xa; }
+#line 75 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'a' + 0xa); }
 	goto _again;
-f0:
+f4:
+#line 76 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'A' + 0xa); }
+	goto _again;
+f9:
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
-f10:
+f12:
 #line 82 "ejson.rl"
 	{ *out++ = '"'; }
 	goto _again;
-f12:
+f14:
 #line 83 "ejson.rl"
 	{ *out++ = '\\'; }
 	goto _again;
-f22:
+f24:
 #line 84 "ejson.rl"
 	{ *out++ = '\t'; }
 	goto _again;
-f14:
+f16:
 #line 85 "ejson.rl"
 	{ *out++ = '\b'; }
 	goto _again;
-f16:
+f18:
 #line 86 "ejson.rl"
 	{ *out++ = '\f'; }
 	goto _again;
-f18:
+f20:
 #line 87 "ejson.rl"
 	{ *out++ = '\n'; }
 	goto _again;
-f20:
-#line 88 "ejson.rl"
-	{ *out++ = '\r'; }
+f10:
+#line 90 "ejson.rl"
+	{*out++ = (*p);}
 	goto _again;
-f7:
+f6:
 #line 74 "ejson.rl"
-	{ u = (u << 4) | (*p) - '0'; }
-#line 78 "ejson.rl"
-	{ out = ejson_append_utf8_glyph(out, u); }
-	goto _again;
-f9:
-#line 75 "ejson.rl"
-	{ u = (u << 4) | (*p) - 'a' + 0xa; }
+	{ u = (u << 4) | ((*p) - '0'); }
 #line 78 "ejson.rl"
 	{ out = ejson_append_utf8_glyph(out, u); }
 	goto _again;
 f8:
-#line 76 "ejson.rl"
-	{ u = (u << 4) | (*p) - 'A' + 0xa; }
+#line 75 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'a' + 0xa); }
 #line 78 "ejson.rl"
 	{ out = ejson_append_utf8_glyph(out, u); }
 	goto _again;
-f1:
+f7:
+#line 76 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'A' + 0xa); }
+#line 78 "ejson.rl"
+	{ out = ejson_append_utf8_glyph(out, u); }
+	goto _again;
+f0:
 #line 78 "ejson.rl"
 	{ u = 0; }
 #line 74 "ejson.rl"
-	{ u = (u << 4) | (*p) - '0'; }
-	goto _again;
-f3:
-#line 78 "ejson.rl"
-	{ u = 0; }
-#line 75 "ejson.rl"
-	{ u = (u << 4) | (*p) - 'a' + 0xa; }
+	{ u = (u << 4) | ((*p) - '0'); }
 	goto _again;
 f2:
 #line 78 "ejson.rl"
 	{ u = 0; }
-#line 76 "ejson.rl"
-	{ u = (u << 4) | (*p) - 'A' + 0xa; }
+#line 75 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'a' + 0xa); }
 	goto _again;
-f11:
+f1:
+#line 78 "ejson.rl"
+	{ u = 0; }
+#line 76 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'A' + 0xa); }
+	goto _again;
+f13:
 #line 82 "ejson.rl"
 	{ *out++ = '"'; }
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
-f13:
+f15:
 #line 83 "ejson.rl"
 	{ *out++ = '\\'; }
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
-f23:
+f25:
 #line 84 "ejson.rl"
 	{ *out++ = '\t'; }
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
-f15:
+f17:
 #line 85 "ejson.rl"
 	{ *out++ = '\b'; }
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
-f17:
+f19:
 #line 86 "ejson.rl"
 	{ *out++ = '\f'; }
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
-f19:
+f21:
 #line 87 "ejson.rl"
 	{ *out++ = '\n'; }
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
-f21:
+f22:
 #line 88 "ejson.rl"
 	{ *out++ = '\r'; }
+#line 90 "ejson.rl"
+	{*out++ = (*p);}
+	goto _again;
+f11:
+#line 90 "ejson.rl"
+	{*out++ = (*p);}
+#line 80 "ejson.rl"
+	{*out++ = (*p);}
+	goto _again;
+f23:
+#line 88 "ejson.rl"
+	{ *out++ = '\r'; }
+#line 90 "ejson.rl"
+	{*out++ = (*p);}
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
@@ -353,35 +374,41 @@ _again:
 	if ( p == eof )
 	{
 	switch ( _ejson_str_eof_actions[cs] ) {
-	case 11:
+	case 13:
 #line 82 "ejson.rl"
 	{ *out++ = '"'; }
 	break;
-	case 13:
+	case 15:
 #line 83 "ejson.rl"
 	{ *out++ = '\\'; }
 	break;
-	case 23:
+	case 25:
 #line 84 "ejson.rl"
 	{ *out++ = '\t'; }
 	break;
-	case 15:
+	case 17:
 #line 85 "ejson.rl"
 	{ *out++ = '\b'; }
 	break;
-	case 17:
+	case 19:
 #line 86 "ejson.rl"
 	{ *out++ = '\f'; }
 	break;
-	case 19:
+	case 21:
 #line 87 "ejson.rl"
 	{ *out++ = '\n'; }
 	break;
-	case 21:
+	case 11:
+#line 90 "ejson.rl"
+	{*out++ = (*p);}
+	break;
+	case 23:
 #line 88 "ejson.rl"
 	{ *out++ = '\r'; }
+#line 90 "ejson.rl"
+	{*out++ = (*p);}
 	break;
-#line 385 "ejson.c"
+#line 412 "ejson.c"
 	}
 	}
 
@@ -396,25 +423,25 @@ _again:
 }
 
 
-#line 400 "ejson.c"
+#line 427 "ejson.c"
 static const short _ejson_eof_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 22, 22, 0, 22, 0, 0, 0, 
+	0, 23, 23, 0, 23, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 47, 0, 
-	0, 0, 0, 47, 0, 0, 0, 22, 
-	22, 0, 22, 0, 0, 47, 47, 47, 
-	47, 0, 47, 47, 0, 0, 0, 0, 
-	47, 0, 0, 0, 47, 0, 0, 0, 
-	47, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 47, 0, 0, 0, 0, 
-	47, 0, 0, 0, 22, 22, 0, 22, 
-	0, 0, 47, 47, 47, 47, 0, 47, 
-	47, 0, 0, 0, 0, 47, 0, 0, 
-	0, 47, 0, 0, 0, 47, 0, 0, 
-	0, 0, 0, 0, 0, 48, 0, 50, 
-	52, 52, 54, 54, 56, 0, 58, 60, 
-	62, 0, 0
+	0, 0, 0, 0, 0, 0, 48, 0, 
+	0, 0, 0, 48, 0, 0, 0, 23, 
+	23, 0, 23, 0, 0, 48, 48, 48, 
+	48, 0, 48, 48, 0, 0, 0, 0, 
+	48, 0, 0, 0, 48, 0, 0, 0, 
+	48, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 48, 0, 0, 0, 0, 
+	48, 0, 0, 0, 23, 23, 0, 23, 
+	0, 0, 48, 48, 48, 48, 0, 48, 
+	48, 0, 0, 0, 0, 48, 0, 0, 
+	0, 48, 0, 0, 0, 48, 0, 0, 
+	0, 0, 0, 0, 0, 49, 0, 51, 
+	53, 53, 55, 55, 57, 0, 59, 61, 
+	63, 0, 0
 };
 
 static const int ejson_start = 1;
@@ -436,20 +463,22 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 	int stack[48], top = 0;
 	int integer_sign = 0;	// for integer decode
 	const char * float_start = NULL;
-	ejson_driver_value_t v = {0};
+	ejson_driver_value_t v; // = {0};
 	uint32_t b64 = 0;
 	int b64_cnt = 0;
 	uint8_t * base64 = NULL;
 	int base64_hold = 0;
+	const char * _value_start = NULL;
 	
+	memset(&v, 0, sizeof(v));
 	
-#line 447 "ejson.c"
+#line 476 "ejson.c"
 	{
 	cs = ejson_start;
 	top = 0;
 	}
 
-#line 453 "ejson.c"
+#line 482 "ejson.c"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -1662,385 +1691,587 @@ case 116:
 	}
 
 	tr1: cs = 0; goto _again;
-	tr44: cs = 0; goto f21;
-	tr105: cs = 0; goto f46;
-	tr334: cs = 0; goto f76;
-	tr336: cs = 0; goto f77;
-	tr347: cs = 0; goto f78;
-	tr348: cs = 0; goto f79;
+	tr44: cs = 0; goto f22;
+	tr105: cs = 0; goto f47;
+	tr334: cs = 0; goto f77;
+	tr336: cs = 0; goto f78;
+	tr347: cs = 0; goto f79;
+	tr348: cs = 0; goto f80;
 	tr0: cs = 1; goto _again;
-	tr2: cs = 2; goto _again;
+	tr2: cs = 2; goto f0;
 	tr17: cs = 3; goto _again;
-	tr14: cs = 3; goto f7;
+	tr14: cs = 3; goto f8;
 	tr19: cs = 4; goto _again;
-	tr16: cs = 4; goto f7;
+	tr16: cs = 4; goto f8;
 	tr20: cs = 5; goto _again;
-	tr3: cs = 5; goto f0;
-	tr45: cs = 5; goto f22;
-	tr52: cs = 5; goto f28;
-	tr60: cs = 5; goto f34;
-	tr22: cs = 6; goto f10;
-	tr23: cs = 6; goto f11;
-	tr24: cs = 6; goto f12;
-	tr25: cs = 6; goto f13;
-	tr26: cs = 6; goto f14;
-	tr47: cs = 6; goto f23;
-	tr48: cs = 6; goto f24;
-	tr49: cs = 6; goto f25;
-	tr50: cs = 6; goto f26;
-	tr51: cs = 6; goto f27;
-	tr54: cs = 6; goto f29;
-	tr55: cs = 6; goto f30;
-	tr56: cs = 6; goto f31;
-	tr57: cs = 6; goto f32;
-	tr58: cs = 6; goto f33;
-	tr62: cs = 6; goto f35;
-	tr63: cs = 6; goto f36;
-	tr64: cs = 6; goto f37;
-	tr65: cs = 6; goto f38;
-	tr66: cs = 6; goto f39;
-	tr27: cs = 7; goto f15;
-	tr28: cs = 7; goto f16;
-	tr29: cs = 7; goto f17;
-	tr30: cs = 7; goto f18;
-	tr31: cs = 7; goto f19;
-	tr32: cs = 8; goto f15;
-	tr33: cs = 8; goto f16;
-	tr34: cs = 8; goto f17;
-	tr36: cs = 8; goto f18;
-	tr37: cs = 8; goto f19;
-	tr38: cs = 9; goto f15;
-	tr39: cs = 9; goto f16;
-	tr40: cs = 9; goto f17;
-	tr42: cs = 9; goto f18;
-	tr43: cs = 9; goto f19;
-	tr41: cs = 10; goto f20;
-	tr35: cs = 11; goto f20;
-	tr59: cs = 12; goto f20;
-	tr4: cs = 13; goto f1;
-	tr5: cs = 13; goto f2;
+	tr3: cs = 5; goto f1;
+	tr45: cs = 5; goto f23;
+	tr52: cs = 5; goto f29;
+	tr60: cs = 5; goto f35;
+	tr22: cs = 6; goto f11;
+	tr23: cs = 6; goto f12;
+	tr24: cs = 6; goto f13;
+	tr25: cs = 6; goto f14;
+	tr26: cs = 6; goto f15;
+	tr47: cs = 6; goto f24;
+	tr48: cs = 6; goto f25;
+	tr49: cs = 6; goto f26;
+	tr50: cs = 6; goto f27;
+	tr51: cs = 6; goto f28;
+	tr54: cs = 6; goto f30;
+	tr55: cs = 6; goto f31;
+	tr56: cs = 6; goto f32;
+	tr57: cs = 6; goto f33;
+	tr58: cs = 6; goto f34;
+	tr62: cs = 6; goto f36;
+	tr63: cs = 6; goto f37;
+	tr64: cs = 6; goto f38;
+	tr65: cs = 6; goto f39;
+	tr66: cs = 6; goto f40;
+	tr27: cs = 7; goto f16;
+	tr28: cs = 7; goto f17;
+	tr29: cs = 7; goto f18;
+	tr30: cs = 7; goto f19;
+	tr31: cs = 7; goto f20;
+	tr32: cs = 8; goto f16;
+	tr33: cs = 8; goto f17;
+	tr34: cs = 8; goto f18;
+	tr36: cs = 8; goto f19;
+	tr37: cs = 8; goto f20;
+	tr38: cs = 9; goto f16;
+	tr39: cs = 9; goto f17;
+	tr40: cs = 9; goto f18;
+	tr42: cs = 9; goto f19;
+	tr43: cs = 9; goto f20;
+	tr41: cs = 10; goto f21;
+	tr35: cs = 11; goto f21;
+	tr59: cs = 12; goto f21;
+	tr4: cs = 13; goto f2;
+	tr5: cs = 13; goto f3;
 	tr67: cs = 14; goto _again;
-	tr6: cs = 14; goto f3;
+	tr6: cs = 14; goto f4;
 	tr342: cs = 15; goto _again;
-	tr10: cs = 16; goto _again;
+	tr10: cs = 16; goto f0;
 	tr74: cs = 17; goto _again;
 	tr75: cs = 18; goto _again;
 	tr76: cs = 19; goto _again;
-	tr11: cs = 20; goto _again;
+	tr11: cs = 20; goto f0;
 	tr78: cs = 21; goto _again;
 	tr79: cs = 22; goto _again;
-	tr12: cs = 23; goto _again;
+	tr12: cs = 23; goto f0;
 	tr81: cs = 24; goto _again;
 	tr82: cs = 25; goto _again;
 	tr85: cs = 27; goto _again;
-	tr84: cs = 27; goto f44;
-	tr107: cs = 27; goto f47;
-	tr118: cs = 27; goto f49;
-	tr164: cs = 27; goto f51;
-	tr168: cs = 27; goto f53;
-	tr175: cs = 27; goto f55;
-	tr183: cs = 27; goto f57;
-	tr189: cs = 27; goto f59;
-	tr195: cs = 27; goto f61;
-	tr86: cs = 28; goto _again;
+	tr84: cs = 27; goto f45;
+	tr107: cs = 27; goto f48;
+	tr118: cs = 27; goto f50;
+	tr164: cs = 27; goto f52;
+	tr168: cs = 27; goto f54;
+	tr175: cs = 27; goto f56;
+	tr183: cs = 27; goto f58;
+	tr189: cs = 27; goto f60;
+	tr195: cs = 27; goto f62;
+	tr86: cs = 28; goto f0;
 	tr102: cs = 29; goto _again;
-	tr99: cs = 29; goto f7;
-	tr100: cs = 30; goto f8;
-	tr103: cs = 30; goto f9;
+	tr99: cs = 29; goto f8;
+	tr100: cs = 30; goto f9;
+	tr103: cs = 30; goto f10;
 	tr177: cs = 31; goto _again;
-	tr106: cs = 31; goto f47;
-	tr117: cs = 31; goto f49;
-	tr163: cs = 31; goto f51;
-	tr167: cs = 31; goto f53;
-	tr174: cs = 31; goto f55;
-	tr182: cs = 31; goto f57;
-	tr188: cs = 31; goto f59;
-	tr194: cs = 31; goto f61;
+	tr106: cs = 31; goto f48;
+	tr117: cs = 31; goto f50;
+	tr163: cs = 31; goto f52;
+	tr167: cs = 31; goto f54;
+	tr174: cs = 31; goto f56;
+	tr182: cs = 31; goto f58;
+	tr188: cs = 31; goto f60;
+	tr194: cs = 31; goto f62;
 	tr109: cs = 32; goto _again;
 	tr104: cs = 33; goto _again;
-	tr101: cs = 33; goto f7;
+	tr101: cs = 33; goto f8;
 	tr110: cs = 34; goto _again;
-	tr87: cs = 34; goto f0;
-	tr137: cs = 34; goto f22;
-	tr144: cs = 34; goto f28;
-	tr152: cs = 34; goto f34;
+	tr87: cs = 34; goto f1;
+	tr137: cs = 34; goto f23;
+	tr144: cs = 34; goto f29;
+	tr152: cs = 34; goto f35;
 	tr111: cs = 35; goto _again;
-	tr138: cs = 35; goto f22;
-	tr145: cs = 35; goto f28;
-	tr153: cs = 35; goto f34;
-	tr112: cs = 36; goto f10;
-	tr113: cs = 36; goto f11;
-	tr114: cs = 36; goto f12;
-	tr115: cs = 36; goto f13;
-	tr116: cs = 36; goto f14;
-	tr139: cs = 36; goto f23;
-	tr140: cs = 36; goto f24;
-	tr141: cs = 36; goto f25;
-	tr142: cs = 36; goto f26;
-	tr143: cs = 36; goto f27;
-	tr146: cs = 36; goto f29;
-	tr147: cs = 36; goto f30;
-	tr148: cs = 36; goto f31;
-	tr149: cs = 36; goto f32;
-	tr150: cs = 36; goto f33;
-	tr154: cs = 36; goto f35;
-	tr155: cs = 36; goto f36;
-	tr156: cs = 36; goto f37;
-	tr157: cs = 36; goto f38;
-	tr158: cs = 36; goto f39;
-	tr120: cs = 37; goto f15;
-	tr121: cs = 37; goto f16;
-	tr122: cs = 37; goto f17;
-	tr123: cs = 37; goto f18;
-	tr124: cs = 37; goto f19;
-	tr125: cs = 38; goto f15;
-	tr126: cs = 38; goto f16;
-	tr127: cs = 38; goto f17;
-	tr129: cs = 38; goto f18;
-	tr130: cs = 38; goto f19;
-	tr131: cs = 39; goto f15;
-	tr132: cs = 39; goto f16;
-	tr133: cs = 39; goto f17;
-	tr135: cs = 39; goto f18;
-	tr136: cs = 39; goto f19;
-	tr134: cs = 40; goto f20;
-	tr128: cs = 41; goto f20;
-	tr151: cs = 42; goto f20;
-	tr88: cs = 43; goto f1;
-	tr89: cs = 43; goto f2;
+	tr138: cs = 35; goto f23;
+	tr145: cs = 35; goto f29;
+	tr153: cs = 35; goto f35;
+	tr112: cs = 36; goto f11;
+	tr113: cs = 36; goto f12;
+	tr114: cs = 36; goto f13;
+	tr115: cs = 36; goto f14;
+	tr116: cs = 36; goto f15;
+	tr139: cs = 36; goto f24;
+	tr140: cs = 36; goto f25;
+	tr141: cs = 36; goto f26;
+	tr142: cs = 36; goto f27;
+	tr143: cs = 36; goto f28;
+	tr146: cs = 36; goto f30;
+	tr147: cs = 36; goto f31;
+	tr148: cs = 36; goto f32;
+	tr149: cs = 36; goto f33;
+	tr150: cs = 36; goto f34;
+	tr154: cs = 36; goto f36;
+	tr155: cs = 36; goto f37;
+	tr156: cs = 36; goto f38;
+	tr157: cs = 36; goto f39;
+	tr158: cs = 36; goto f40;
+	tr120: cs = 37; goto f16;
+	tr121: cs = 37; goto f17;
+	tr122: cs = 37; goto f18;
+	tr123: cs = 37; goto f19;
+	tr124: cs = 37; goto f20;
+	tr125: cs = 38; goto f16;
+	tr126: cs = 38; goto f17;
+	tr127: cs = 38; goto f18;
+	tr129: cs = 38; goto f19;
+	tr130: cs = 38; goto f20;
+	tr131: cs = 39; goto f16;
+	tr132: cs = 39; goto f17;
+	tr133: cs = 39; goto f18;
+	tr135: cs = 39; goto f19;
+	tr136: cs = 39; goto f20;
+	tr134: cs = 40; goto f21;
+	tr128: cs = 41; goto f21;
+	tr151: cs = 42; goto f21;
+	tr88: cs = 43; goto f2;
+	tr89: cs = 43; goto f3;
 	tr159: cs = 44; goto _again;
-	tr90: cs = 44; goto f3;
+	tr90: cs = 44; goto f4;
 	tr162: cs = 45; goto _again;
 	tr166: cs = 46; goto _again;
-	tr91: cs = 47; goto f4;
-	tr160: cs = 47; goto f40;
-	tr92: cs = 48; goto f4;
-	tr161: cs = 48; goto f40;
+	tr91: cs = 47; goto f5;
+	tr160: cs = 47; goto f41;
+	tr92: cs = 48; goto f5;
+	tr161: cs = 48; goto f41;
 	tr170: cs = 49; goto _again;
-	tr171: cs = 50; goto f41;
-	tr172: cs = 50; goto f42;
-	tr173: cs = 50; goto f43;
-	tr93: cs = 51; goto f5;
-	tr98: cs = 51; goto f6;
-	tr95: cs = 52; goto _again;
+	tr171: cs = 50; goto f42;
+	tr172: cs = 50; goto f43;
+	tr173: cs = 50; goto f44;
+	tr93: cs = 51; goto f6;
+	tr98: cs = 51; goto f7;
+	tr95: cs = 52; goto f0;
 	tr178: cs = 53; goto _again;
 	tr179: cs = 54; goto _again;
 	tr180: cs = 55; goto _again;
 	tr181: cs = 56; goto _again;
-	tr96: cs = 57; goto _again;
+	tr96: cs = 57; goto f0;
 	tr185: cs = 58; goto _again;
 	tr186: cs = 59; goto _again;
 	tr187: cs = 60; goto _again;
-	tr97: cs = 61; goto _again;
+	tr97: cs = 61; goto f0;
 	tr191: cs = 62; goto _again;
 	tr192: cs = 63; goto _again;
 	tr193: cs = 64; goto _again;
 	tr198: cs = 66; goto _again;
-	tr233: cs = 66; goto f47;
-	tr244: cs = 66; goto f49;
-	tr290: cs = 66; goto f51;
-	tr294: cs = 66; goto f53;
-	tr301: cs = 66; goto f55;
-	tr309: cs = 66; goto f57;
-	tr315: cs = 66; goto f59;
-	tr321: cs = 66; goto f61;
-	tr197: cs = 66; goto f63;
+	tr233: cs = 66; goto f48;
+	tr244: cs = 66; goto f50;
+	tr290: cs = 66; goto f52;
+	tr294: cs = 66; goto f54;
+	tr301: cs = 66; goto f56;
+	tr309: cs = 66; goto f58;
+	tr315: cs = 66; goto f60;
+	tr321: cs = 66; goto f62;
+	tr197: cs = 66; goto f64;
 	tr199: cs = 67; goto _again;
 	tr205: cs = 68; goto _again;
-	tr202: cs = 68; goto f7;
-	tr203: cs = 69; goto f8;
-	tr206: cs = 69; goto f9;
-	tr208: cs = 70; goto f65;
-	tr330: cs = 70; goto f75;
+	tr202: cs = 68; goto f8;
+	tr203: cs = 69; goto f9;
+	tr206: cs = 69; goto f10;
+	tr208: cs = 70; goto f66;
+	tr330: cs = 70; goto f76;
 	tr211: cs = 71; goto _again;
-	tr325: cs = 71; goto f74;
+	tr325: cs = 71; goto f75;
 	tr213: cs = 72; goto _again;
-	tr210: cs = 72; goto f65;
-	tr333: cs = 72; goto f75;
-	tr214: cs = 73; goto _again;
+	tr210: cs = 72; goto f66;
+	tr333: cs = 72; goto f76;
+	tr214: cs = 73; goto f0;
 	tr229: cs = 74; goto _again;
-	tr226: cs = 74; goto f7;
-	tr227: cs = 75; goto f8;
-	tr230: cs = 75; goto f9;
+	tr226: cs = 74; goto f8;
+	tr227: cs = 75; goto f9;
+	tr230: cs = 75; goto f10;
 	tr303: cs = 76; goto _again;
-	tr232: cs = 76; goto f47;
-	tr243: cs = 76; goto f49;
-	tr289: cs = 76; goto f51;
-	tr293: cs = 76; goto f53;
-	tr300: cs = 76; goto f55;
-	tr308: cs = 76; goto f57;
-	tr314: cs = 76; goto f59;
-	tr320: cs = 76; goto f61;
+	tr232: cs = 76; goto f48;
+	tr243: cs = 76; goto f50;
+	tr289: cs = 76; goto f52;
+	tr293: cs = 76; goto f54;
+	tr300: cs = 76; goto f56;
+	tr308: cs = 76; goto f58;
+	tr314: cs = 76; goto f60;
+	tr320: cs = 76; goto f62;
 	tr235: cs = 77; goto _again;
 	tr231: cs = 78; goto _again;
-	tr228: cs = 78; goto f7;
+	tr228: cs = 78; goto f8;
 	tr236: cs = 79; goto _again;
-	tr215: cs = 79; goto f0;
-	tr263: cs = 79; goto f22;
-	tr270: cs = 79; goto f28;
-	tr278: cs = 79; goto f34;
+	tr215: cs = 79; goto f1;
+	tr263: cs = 79; goto f23;
+	tr270: cs = 79; goto f29;
+	tr278: cs = 79; goto f35;
 	tr237: cs = 80; goto _again;
-	tr264: cs = 80; goto f22;
-	tr271: cs = 80; goto f28;
-	tr279: cs = 80; goto f34;
-	tr238: cs = 81; goto f10;
-	tr239: cs = 81; goto f11;
-	tr240: cs = 81; goto f12;
-	tr241: cs = 81; goto f13;
-	tr242: cs = 81; goto f14;
-	tr265: cs = 81; goto f23;
-	tr266: cs = 81; goto f24;
-	tr267: cs = 81; goto f25;
-	tr268: cs = 81; goto f26;
-	tr269: cs = 81; goto f27;
-	tr272: cs = 81; goto f29;
-	tr273: cs = 81; goto f30;
-	tr274: cs = 81; goto f31;
-	tr275: cs = 81; goto f32;
-	tr276: cs = 81; goto f33;
-	tr280: cs = 81; goto f35;
-	tr281: cs = 81; goto f36;
-	tr282: cs = 81; goto f37;
-	tr283: cs = 81; goto f38;
-	tr284: cs = 81; goto f39;
-	tr246: cs = 82; goto f15;
-	tr247: cs = 82; goto f16;
-	tr248: cs = 82; goto f17;
-	tr249: cs = 82; goto f18;
-	tr250: cs = 82; goto f19;
-	tr251: cs = 83; goto f15;
-	tr252: cs = 83; goto f16;
-	tr253: cs = 83; goto f17;
-	tr255: cs = 83; goto f18;
-	tr256: cs = 83; goto f19;
-	tr257: cs = 84; goto f15;
-	tr258: cs = 84; goto f16;
-	tr259: cs = 84; goto f17;
-	tr261: cs = 84; goto f18;
-	tr262: cs = 84; goto f19;
-	tr260: cs = 85; goto f20;
-	tr254: cs = 86; goto f20;
-	tr277: cs = 87; goto f20;
-	tr216: cs = 88; goto f1;
-	tr217: cs = 88; goto f2;
+	tr264: cs = 80; goto f23;
+	tr271: cs = 80; goto f29;
+	tr279: cs = 80; goto f35;
+	tr238: cs = 81; goto f11;
+	tr239: cs = 81; goto f12;
+	tr240: cs = 81; goto f13;
+	tr241: cs = 81; goto f14;
+	tr242: cs = 81; goto f15;
+	tr265: cs = 81; goto f24;
+	tr266: cs = 81; goto f25;
+	tr267: cs = 81; goto f26;
+	tr268: cs = 81; goto f27;
+	tr269: cs = 81; goto f28;
+	tr272: cs = 81; goto f30;
+	tr273: cs = 81; goto f31;
+	tr274: cs = 81; goto f32;
+	tr275: cs = 81; goto f33;
+	tr276: cs = 81; goto f34;
+	tr280: cs = 81; goto f36;
+	tr281: cs = 81; goto f37;
+	tr282: cs = 81; goto f38;
+	tr283: cs = 81; goto f39;
+	tr284: cs = 81; goto f40;
+	tr246: cs = 82; goto f16;
+	tr247: cs = 82; goto f17;
+	tr248: cs = 82; goto f18;
+	tr249: cs = 82; goto f19;
+	tr250: cs = 82; goto f20;
+	tr251: cs = 83; goto f16;
+	tr252: cs = 83; goto f17;
+	tr253: cs = 83; goto f18;
+	tr255: cs = 83; goto f19;
+	tr256: cs = 83; goto f20;
+	tr257: cs = 84; goto f16;
+	tr258: cs = 84; goto f17;
+	tr259: cs = 84; goto f18;
+	tr261: cs = 84; goto f19;
+	tr262: cs = 84; goto f20;
+	tr260: cs = 85; goto f21;
+	tr254: cs = 86; goto f21;
+	tr277: cs = 87; goto f21;
+	tr216: cs = 88; goto f2;
+	tr217: cs = 88; goto f3;
 	tr285: cs = 89; goto _again;
-	tr218: cs = 89; goto f3;
+	tr218: cs = 89; goto f4;
 	tr288: cs = 90; goto _again;
 	tr291: cs = 91; goto _again;
-	tr219: cs = 92; goto f4;
-	tr286: cs = 92; goto f40;
-	tr220: cs = 93; goto f4;
-	tr287: cs = 93; goto f40;
+	tr219: cs = 92; goto f5;
+	tr286: cs = 92; goto f41;
+	tr220: cs = 93; goto f5;
+	tr287: cs = 93; goto f41;
 	tr295: cs = 94; goto _again;
-	tr297: cs = 95; goto f41;
-	tr298: cs = 95; goto f42;
-	tr299: cs = 95; goto f43;
-	tr221: cs = 96; goto f5;
-	tr225: cs = 96; goto f6;
-	tr222: cs = 97; goto _again;
+	tr297: cs = 95; goto f42;
+	tr298: cs = 95; goto f43;
+	tr299: cs = 95; goto f44;
+	tr221: cs = 96; goto f6;
+	tr225: cs = 96; goto f7;
+	tr222: cs = 97; goto f0;
 	tr304: cs = 98; goto _again;
 	tr305: cs = 99; goto _again;
 	tr306: cs = 100; goto _again;
 	tr307: cs = 101; goto _again;
-	tr223: cs = 102; goto _again;
+	tr223: cs = 102; goto f0;
 	tr311: cs = 103; goto _again;
 	tr312: cs = 104; goto _again;
 	tr313: cs = 105; goto _again;
-	tr224: cs = 106; goto _again;
+	tr224: cs = 106; goto f0;
 	tr317: cs = 107; goto _again;
 	tr318: cs = 108; goto _again;
 	tr319: cs = 109; goto _again;
 	tr212: cs = 110; goto _again;
-	tr209: cs = 110; goto f65;
-	tr331: cs = 110; goto f75;
+	tr209: cs = 110; goto f66;
+	tr331: cs = 110; goto f76;
 	tr327: cs = 111; goto _again;
-	tr323: cs = 111; goto f7;
-	tr324: cs = 112; goto f74;
+	tr323: cs = 111; goto f8;
+	tr324: cs = 112; goto f75;
 	tr328: cs = 113; goto _again;
 	tr329: cs = 114; goto _again;
-	tr326: cs = 114; goto f74;
+	tr326: cs = 114; goto f75;
 	tr207: cs = 115; goto _again;
-	tr204: cs = 115; goto f7;
+	tr204: cs = 115; goto f8;
 	tr332: cs = 116; goto _again;
-	tr200: cs = 116; goto f7;
-	tr15: cs = 117; goto f8;
-	tr18: cs = 117; goto f9;
+	tr200: cs = 116; goto f8;
+	tr15: cs = 117; goto f9;
+	tr18: cs = 117; goto f10;
 	tr337: cs = 118; goto _again;
-	tr335: cs = 118; goto f47;
-	tr338: cs = 118; goto f49;
-	tr339: cs = 118; goto f51;
-	tr341: cs = 118; goto f53;
-	tr343: cs = 118; goto f55;
-	tr344: cs = 118; goto f57;
-	tr345: cs = 118; goto f59;
-	tr346: cs = 118; goto f61;
+	tr335: cs = 118; goto f48;
+	tr338: cs = 118; goto f50;
+	tr339: cs = 118; goto f52;
+	tr341: cs = 118; goto f54;
+	tr343: cs = 118; goto f56;
+	tr344: cs = 118; goto f58;
+	tr345: cs = 118; goto f60;
+	tr346: cs = 118; goto f62;
 	tr21: cs = 119; goto _again;
-	tr46: cs = 119; goto f22;
-	tr53: cs = 119; goto f28;
-	tr61: cs = 119; goto f34;
+	tr46: cs = 119; goto f23;
+	tr53: cs = 119; goto f29;
+	tr61: cs = 119; goto f35;
 	tr70: cs = 120; goto _again;
 	tr340: cs = 121; goto _again;
-	tr7: cs = 122; goto f4;
-	tr68: cs = 122; goto f40;
-	tr8: cs = 123; goto f4;
-	tr69: cs = 123; goto f40;
-	tr71: cs = 124; goto f41;
-	tr72: cs = 124; goto f42;
-	tr73: cs = 124; goto f43;
-	tr9: cs = 125; goto f5;
-	tr13: cs = 125; goto f6;
+	tr7: cs = 122; goto f5;
+	tr68: cs = 122; goto f41;
+	tr8: cs = 123; goto f5;
+	tr69: cs = 123; goto f41;
+	tr71: cs = 124; goto f42;
+	tr72: cs = 124; goto f43;
+	tr73: cs = 124; goto f44;
+	tr9: cs = 125; goto f6;
+	tr13: cs = 125; goto f7;
 	tr77: cs = 126; goto _again;
 	tr80: cs = 127; goto _again;
 	tr83: cs = 128; goto _again;
-	tr94: cs = 129; goto f45;
-	tr108: cs = 129; goto f48;
-	tr119: cs = 129; goto f50;
-	tr165: cs = 129; goto f52;
-	tr169: cs = 129; goto f54;
-	tr176: cs = 129; goto f56;
-	tr184: cs = 129; goto f58;
-	tr190: cs = 129; goto f60;
-	tr196: cs = 129; goto f62;
-	tr201: cs = 130; goto f64;
-	tr234: cs = 130; goto f66;
-	tr245: cs = 130; goto f67;
-	tr292: cs = 130; goto f68;
-	tr296: cs = 130; goto f69;
-	tr302: cs = 130; goto f70;
-	tr310: cs = 130; goto f71;
-	tr316: cs = 130; goto f72;
-	tr322: cs = 130; goto f73;
+	tr94: cs = 129; goto f46;
+	tr108: cs = 129; goto f49;
+	tr119: cs = 129; goto f51;
+	tr165: cs = 129; goto f53;
+	tr169: cs = 129; goto f55;
+	tr176: cs = 129; goto f57;
+	tr184: cs = 129; goto f59;
+	tr190: cs = 129; goto f61;
+	tr196: cs = 129; goto f63;
+	tr201: cs = 130; goto f65;
+	tr234: cs = 130; goto f67;
+	tr245: cs = 130; goto f68;
+	tr292: cs = 130; goto f69;
+	tr296: cs = 130; goto f70;
+	tr302: cs = 130; goto f71;
+	tr310: cs = 130; goto f72;
+	tr316: cs = 130; goto f73;
+	tr322: cs = 130; goto f74;
 
-f63:
-#line 126 "ejson.rl"
+f64:
+#line 128 "ejson.rl"
 	{ d->open_object(d); }
 	goto _again;
-f44:
-#line 128 "ejson.rl"
+f45:
+#line 130 "ejson.rl"
 	{ d->open_array(d); }
 	goto _again;
-f65:
-#line 130 "ejson.rl"
+f66:
+#line 132 "ejson.rl"
 	{ d->set_name(d, &v); }
 	goto _again;
-f47:
-#line 132 "ejson.rl"
+f48:
+#line 134 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_string, &v); }
 	goto _again;
-f61:
-#line 136 "ejson.rl"
+f62:
+#line 138 "ejson.rl"
 	{ v.u.v_bool = 1; d->set_value(d, ejson_driver_type_bool, &v); }
 	goto _again;
-f57:
-#line 137 "ejson.rl"
+f58:
+#line 139 "ejson.rl"
 	{ v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
 	goto _again;
-f59:
-#line 138 "ejson.rl"
+f60:
+#line 140 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_null, NULL); }
 	goto _again;
+f50:
+#line 159 "ejson.rl"
+	{ 
+			if (base64_hold && d->add_data)
+				d->add_data(d, base64, base64_hold);
+			if (d->close_data) d->close_data(d);
+		}
+	goto _again;
+f8:
+#line 172 "ejson.rl"
+	{ v.u.v_str.start = v.u.v_str.end = p; }
+	goto _again;
+f10:
+#line 173 "ejson.rl"
+	{ v.u.v_str.end = p; }
+	goto _again;
+f41:
+#line 183 "ejson.rl"
+	{ v.u.v_int = (v.u.v_int * 10) + ((*p) - '0'); }
+	goto _again;
+f42:
+#line 193 "ejson.rl"
+	{ v.u.v_int = (v.u.v_int << 4) | ((*p) - '0'); }
+	goto _again;
+f44:
+#line 194 "ejson.rl"
+	{ v.u.v_int = (v.u.v_int << 4) | ((*p) - 'a' + 0xa); }
+	goto _again;
+f43:
+#line 195 "ejson.rl"
+	{ v.u.v_int = (v.u.v_int << 4) | ((*p) - 'A' + 0xa); }
+	goto _again;
+f19:
+#line 216 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - 'A'); }
+	goto _again;
+f20:
+#line 217 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
+	goto _again;
+f18:
+#line 218 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
+	goto _again;
+f16:
+#line 219 "ejson.rl"
+	{ b64 = (b64 << 6) | 62; }
+	goto _again;
+f17:
+#line 220 "ejson.rl"
+	{ b64 = (b64 << 6) | 63; }
+	goto _again;
+f21:
+#line 222 "ejson.rl"
+	{ b64 = (b64 << 6); }
+	goto _again;
+f22:
+#line 237 "ejson.rl"
+	{ printf("### base64 Error : '%s'\n", p); }
+	goto _again;
 f0:
-#line 140 "ejson.rl"
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+	goto _again;
+f47:
+#line 254 "ejson.rl"
+	{ printf("### Value[%d] Error : '%s'\n", top, _value_start); }
+	goto _again;
+f79:
+#line 261 "ejson.rl"
+	{ printf("### Array[%d] Error : '%s'\n", top, p); }
+	goto _again;
+f80:
+#line 274 "ejson.rl"
+	{ printf("### Object[%d] Error : '%s'\n", top, p); }
+	goto _again;
+f78:
+#line 278 "ejson.rl"
+	{ printf("### ejson Error : '%s'\n", p); }
+	goto _again;
+f65:
+#line 129 "ejson.rl"
+	{ d->close_object(d); }
+#line 273 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f46:
+#line 131 "ejson.rl"
+	{ d->close_array(d); }
+#line 260 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f9:
+#line 172 "ejson.rl"
+	{ v.u.v_str.start = v.u.v_str.end = p; }
+#line 173 "ejson.rl"
+	{ v.u.v_str.end = p; }
+	goto _again;
+f76:
+#line 173 "ejson.rl"
+	{ v.u.v_str.end = p; }
+#line 132 "ejson.rl"
+	{ d->set_name(d, &v); }
+	goto _again;
+f75:
+#line 173 "ejson.rl"
+	{ v.u.v_str.end = p; }
+#line 133 "ejson.rl"
+	{ if (d->add_flag) d->add_flag(d, &v); }
+	goto _again;
+f54:
+#line 184 "ejson.rl"
+	{  v.u.v_int *= integer_sign; }
+#line 135 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_integer, &v); }
+	goto _again;
+f56:
+#line 184 "ejson.rl"
+	{  v.u.v_int *= integer_sign; }
+#line 137 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_hex, &v); }
+	goto _again;
+f52:
+#line 204 "ejson.rl"
+	{ sscanf(float_start, "%lf", &v.u.v_float); }
+#line 136 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_float, &v); }
+	goto _again;
+f23:
+#line 225 "ejson.rl"
+	{ b64_cnt = 3; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+	goto _again;
+f29:
+#line 230 "ejson.rl"
+	{ b64_cnt = 2; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+	goto _again;
+f35:
+#line 232 "ejson.rl"
+	{ b64_cnt = 1; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+	goto _again;
+f14:
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 216 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - 'A'); }
+	goto _again;
+f15:
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 217 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
+	goto _again;
+f13:
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 218 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
+	goto _again;
+f11:
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 219 "ejson.rl"
+	{ b64 = (b64 << 6) | 62; }
+	goto _again;
+f12:
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 220 "ejson.rl"
+	{ b64 = (b64 << 6) | 63; }
+	goto _again;
+f1:
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+#line 142 "ejson.rl"
 	{ 
 			if (d->open_data) {
 				d->open_data(d);
@@ -2050,412 +2281,190 @@ f0:
 			}
 		}
 	goto _again;
-f49:
-#line 157 "ejson.rl"
-	{ 
-			if (base64_hold && d->add_data)
-				d->add_data(d, base64, base64_hold);
-			if (d->close_data) d->close_data(d);
-		}
+f4:
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+#line 203 "ejson.rl"
+	{ float_start = p; }
 	goto _again;
 f7:
-#line 170 "ejson.rl"
-	{ v.u.v_str.start = v.u.v_str.end = p; }
-	goto _again;
-f9:
-#line 171 "ejson.rl"
-	{ v.u.v_str.end = p; }
-	goto _again;
-f40:
-#line 181 "ejson.rl"
-	{ v.u.v_int = (v.u.v_int * 10) + ((*p) - '0'); }
-	goto _again;
-f41:
-#line 191 "ejson.rl"
-	{ v.u.v_int = (v.u.v_int << 4) | (*p) - '0'; }
-	goto _again;
-f43:
-#line 192 "ejson.rl"
-	{ v.u.v_int = (v.u.v_int << 4) | (*p) - 'a' + 0xa; }
-	goto _again;
-f42:
-#line 193 "ejson.rl"
-	{ v.u.v_int = (v.u.v_int << 4) | (*p) - 'A' + 0xa; }
-	goto _again;
-f3:
-#line 201 "ejson.rl"
-	{ float_start = p; }
-	goto _again;
-f18:
-#line 214 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'A'); }
-	goto _again;
-f19:
-#line 215 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
-	goto _again;
-f17:
-#line 216 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
-	goto _again;
-f15:
-#line 217 "ejson.rl"
-	{ b64 = (b64 << 6) | 62; }
-	goto _again;
-f16:
-#line 218 "ejson.rl"
-	{ b64 = (b64 << 6) | 63; }
-	goto _again;
-f20:
-#line 220 "ejson.rl"
-	{ b64 = (b64 << 6); }
-	goto _again;
-f21:
-#line 235 "ejson.rl"
-	{ printf("### base64 Error : '%s'\n", p); }
-	goto _again;
-f6:
-#line 248 "ejson.rl"
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+#line 250 "ejson.rl"
 	{ p--; {stack[top++] = cs; cs = 65; goto _again;} }
 	goto _again;
-f5:
-#line 249 "ejson.rl"
+f6:
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+#line 251 "ejson.rl"
 	{ p--; {stack[top++] = cs; cs = 26; goto _again;} }
 	goto _again;
-f46:
-#line 252 "ejson.rl"
-	{ printf("### Value[%d] Error : '%s'\n", top, p); }
-	goto _again;
-f78:
-#line 259 "ejson.rl"
-	{ printf("### Array[%d] Error : '%s'\n", top, p); }
-	goto _again;
-f79:
-#line 272 "ejson.rl"
-	{ printf("### Object[%d] Error : '%s'\n", top, p); }
-	goto _again;
 f77:
-#line 276 "ejson.rl"
+#line 254 "ejson.rl"
+	{ printf("### Value[%d] Error : '%s'\n", top, _value_start); }
+#line 278 "ejson.rl"
 	{ printf("### ejson Error : '%s'\n", p); }
 	goto _again;
-f64:
-#line 127 "ejson.rl"
-	{ d->close_object(d); }
-#line 271 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f45:
+f67:
+#line 134 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_string, &v); }
 #line 129 "ejson.rl"
-	{ d->close_array(d); }
-#line 258 "ejson.rl"
+	{ d->close_object(d); }
+#line 273 "ejson.rl"
 	{ {cs = stack[--top];goto _again;} }
 	goto _again;
-f8:
-#line 170 "ejson.rl"
-	{ v.u.v_str.start = v.u.v_str.end = p; }
-#line 171 "ejson.rl"
-	{ v.u.v_str.end = p; }
-	goto _again;
-f75:
-#line 171 "ejson.rl"
-	{ v.u.v_str.end = p; }
-#line 130 "ejson.rl"
-	{ d->set_name(d, &v); }
+f49:
+#line 134 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_string, &v); }
+#line 131 "ejson.rl"
+	{ d->close_array(d); }
+#line 260 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
 	goto _again;
 f74:
-#line 171 "ejson.rl"
-	{ v.u.v_str.end = p; }
+#line 138 "ejson.rl"
+	{ v.u.v_bool = 1; d->set_value(d, ejson_driver_type_bool, &v); }
+#line 129 "ejson.rl"
+	{ d->close_object(d); }
+#line 273 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f63:
+#line 138 "ejson.rl"
+	{ v.u.v_bool = 1; d->set_value(d, ejson_driver_type_bool, &v); }
 #line 131 "ejson.rl"
-	{ if (d->add_flag) d->add_flag(d, &v); }
-	goto _again;
-f1:
-#line 179 "ejson.rl"
-	{ v.u.v_int = 0; integer_sign = 1; }
-#line 201 "ejson.rl"
-	{ float_start = p; }
-	goto _again;
-f53:
-#line 182 "ejson.rl"
-	{  v.u.v_int *= integer_sign; }
-#line 133 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_integer, &v); }
-	goto _again;
-f55:
-#line 182 "ejson.rl"
-	{  v.u.v_int *= integer_sign; }
-#line 135 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_hex, &v); }
-	goto _again;
-f51:
-#line 202 "ejson.rl"
-	{ sscanf(float_start, "%lf", &v.u.v_float); }
-#line 134 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_float, &v); }
-	goto _again;
-f22:
-#line 223 "ejson.rl"
-	{ b64_cnt = 3; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-	goto _again;
-f28:
-#line 228 "ejson.rl"
-	{ b64_cnt = 2; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-	goto _again;
-f34:
-#line 230 "ejson.rl"
-	{ b64_cnt = 1; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-	goto _again;
-f13:
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 214 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'A'); }
-	goto _again;
-f14:
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 215 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
-	goto _again;
-f12:
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 216 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
-	goto _again;
-f10:
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 217 "ejson.rl"
-	{ b64 = (b64 << 6) | 62; }
-	goto _again;
-f11:
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 218 "ejson.rl"
-	{ b64 = (b64 << 6) | 63; }
-	goto _again;
-f76:
-#line 252 "ejson.rl"
-	{ printf("### Value[%d] Error : '%s'\n", top, p); }
-#line 276 "ejson.rl"
-	{ printf("### ejson Error : '%s'\n", p); }
-	goto _again;
-f66:
-#line 132 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_string, &v); }
-#line 127 "ejson.rl"
-	{ d->close_object(d); }
-#line 271 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f48:
-#line 132 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_string, &v); }
-#line 129 "ejson.rl"
 	{ d->close_array(d); }
-#line 258 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f73:
-#line 136 "ejson.rl"
-	{ v.u.v_bool = 1; d->set_value(d, ejson_driver_type_bool, &v); }
-#line 127 "ejson.rl"
-	{ d->close_object(d); }
-#line 271 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f62:
-#line 136 "ejson.rl"
-	{ v.u.v_bool = 1; d->set_value(d, ejson_driver_type_bool, &v); }
-#line 129 "ejson.rl"
-	{ d->close_array(d); }
-#line 258 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f71:
-#line 137 "ejson.rl"
-	{ v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
-#line 127 "ejson.rl"
-	{ d->close_object(d); }
-#line 271 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f58:
-#line 137 "ejson.rl"
-	{ v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
-#line 129 "ejson.rl"
-	{ d->close_array(d); }
-#line 258 "ejson.rl"
+#line 260 "ejson.rl"
 	{ {cs = stack[--top];goto _again;} }
 	goto _again;
 f72:
-#line 138 "ejson.rl"
+#line 139 "ejson.rl"
+	{ v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
+#line 129 "ejson.rl"
+	{ d->close_object(d); }
+#line 273 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f59:
+#line 139 "ejson.rl"
+	{ v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
+#line 131 "ejson.rl"
+	{ d->close_array(d); }
+#line 260 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f73:
+#line 140 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_null, NULL); }
-#line 127 "ejson.rl"
+#line 129 "ejson.rl"
 	{ d->close_object(d); }
-#line 271 "ejson.rl"
+#line 273 "ejson.rl"
 	{ {cs = stack[--top];goto _again;} }
 	goto _again;
-f60:
-#line 138 "ejson.rl"
+f61:
+#line 140 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_null, NULL); }
-#line 129 "ejson.rl"
+#line 131 "ejson.rl"
 	{ d->close_array(d); }
-#line 258 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f67:
-#line 157 "ejson.rl"
-	{ 
-			if (base64_hold && d->add_data)
-				d->add_data(d, base64, base64_hold);
-			if (d->close_data) d->close_data(d);
-		}
-#line 127 "ejson.rl"
-	{ d->close_object(d); }
-#line 271 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f50:
-#line 157 "ejson.rl"
-	{ 
-			if (base64_hold && d->add_data)
-				d->add_data(d, base64, base64_hold);
-			if (d->close_data) d->close_data(d);
-		}
-#line 129 "ejson.rl"
-	{ d->close_array(d); }
-#line 258 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f2:
-#line 179 "ejson.rl"
-	{ v.u.v_int = 0; integer_sign = 1; }
-#line 180 "ejson.rl"
-	{ integer_sign = -1; }
-#line 201 "ejson.rl"
-	{ float_start = p; }
-	goto _again;
-f4:
-#line 179 "ejson.rl"
-	{ v.u.v_int = 0; integer_sign = 1; }
-#line 181 "ejson.rl"
-	{ v.u.v_int = (v.u.v_int * 10) + ((*p) - '0'); }
-#line 201 "ejson.rl"
-	{ float_start = p; }
-	goto _again;
-f69:
-#line 182 "ejson.rl"
-	{  v.u.v_int *= integer_sign; }
-#line 133 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_integer, &v); }
-#line 127 "ejson.rl"
-	{ d->close_object(d); }
-#line 271 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f54:
-#line 182 "ejson.rl"
-	{  v.u.v_int *= integer_sign; }
-#line 133 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_integer, &v); }
-#line 129 "ejson.rl"
-	{ d->close_array(d); }
-#line 258 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f70:
-#line 182 "ejson.rl"
-	{  v.u.v_int *= integer_sign; }
-#line 135 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_hex, &v); }
-#line 127 "ejson.rl"
-	{ d->close_object(d); }
-#line 271 "ejson.rl"
-	{ {cs = stack[--top];goto _again;} }
-	goto _again;
-f56:
-#line 182 "ejson.rl"
-	{  v.u.v_int *= integer_sign; }
-#line 135 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_hex, &v); }
-#line 129 "ejson.rl"
-	{ d->close_array(d); }
-#line 258 "ejson.rl"
+#line 260 "ejson.rl"
 	{ {cs = stack[--top];goto _again;} }
 	goto _again;
 f68:
-#line 202 "ejson.rl"
-	{ sscanf(float_start, "%lf", &v.u.v_float); }
-#line 134 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_float, &v); }
-#line 127 "ejson.rl"
+#line 159 "ejson.rl"
+	{ 
+			if (base64_hold && d->add_data)
+				d->add_data(d, base64, base64_hold);
+			if (d->close_data) d->close_data(d);
+		}
+#line 129 "ejson.rl"
 	{ d->close_object(d); }
-#line 271 "ejson.rl"
+#line 273 "ejson.rl"
 	{ {cs = stack[--top];goto _again;} }
 	goto _again;
-f52:
-#line 202 "ejson.rl"
+f51:
+#line 159 "ejson.rl"
+	{ 
+			if (base64_hold && d->add_data)
+				d->add_data(d, base64, base64_hold);
+			if (d->close_data) d->close_data(d);
+		}
+#line 131 "ejson.rl"
+	{ d->close_array(d); }
+#line 260 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f2:
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+#line 181 "ejson.rl"
+	{ v.u.v_int = 0; integer_sign = 1; }
+#line 203 "ejson.rl"
+	{ float_start = p; }
+	goto _again;
+f70:
+#line 184 "ejson.rl"
+	{  v.u.v_int *= integer_sign; }
+#line 135 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_integer, &v); }
+#line 129 "ejson.rl"
+	{ d->close_object(d); }
+#line 273 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f55:
+#line 184 "ejson.rl"
+	{  v.u.v_int *= integer_sign; }
+#line 135 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_integer, &v); }
+#line 131 "ejson.rl"
+	{ d->close_array(d); }
+#line 260 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f71:
+#line 184 "ejson.rl"
+	{  v.u.v_int *= integer_sign; }
+#line 137 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_hex, &v); }
+#line 129 "ejson.rl"
+	{ d->close_object(d); }
+#line 273 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f57:
+#line 184 "ejson.rl"
+	{  v.u.v_int *= integer_sign; }
+#line 137 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_hex, &v); }
+#line 131 "ejson.rl"
+	{ d->close_array(d); }
+#line 260 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
+	goto _again;
+f69:
+#line 204 "ejson.rl"
 	{ sscanf(float_start, "%lf", &v.u.v_float); }
-#line 134 "ejson.rl"
+#line 136 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_float, &v); }
 #line 129 "ejson.rl"
-	{ d->close_array(d); }
-#line 258 "ejson.rl"
+	{ d->close_object(d); }
+#line 273 "ejson.rl"
 	{ {cs = stack[--top];goto _again;} }
 	goto _again;
-f26:
-#line 223 "ejson.rl"
-	{ b64_cnt = 3; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 214 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'A'); }
+f53:
+#line 204 "ejson.rl"
+	{ sscanf(float_start, "%lf", &v.u.v_float); }
+#line 136 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_float, &v); }
+#line 131 "ejson.rl"
+	{ d->close_array(d); }
+#line 260 "ejson.rl"
+	{ {cs = stack[--top];goto _again;} }
 	goto _again;
 f27:
-#line 223 "ejson.rl"
+#line 225 "ejson.rl"
 	{ b64_cnt = 3; }
-#line 148 "ejson.rl"
+#line 150 "ejson.rl"
 	{
 			if (base64_hold + b64_cnt >= 128) {
 				if (d->add_data)
@@ -2465,33 +2474,15 @@ f27:
 			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 215 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
-	goto _again;
-f25:
-#line 223 "ejson.rl"
-	{ b64_cnt = 3; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
+#line 236 "ejson.rl"
 	{b64 = 0;}
 #line 216 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
+	{ b64 = (b64 << 6) | ((*p) - 'A'); }
 	goto _again;
-f23:
-#line 223 "ejson.rl"
+f28:
+#line 225 "ejson.rl"
 	{ b64_cnt = 3; }
-#line 148 "ejson.rl"
+#line 150 "ejson.rl"
 	{
 			if (base64_hold + b64_cnt >= 128) {
 				if (d->add_data)
@@ -2501,15 +2492,33 @@ f23:
 			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-#line 234 "ejson.rl"
+#line 236 "ejson.rl"
 	{b64 = 0;}
 #line 217 "ejson.rl"
-	{ b64 = (b64 << 6) | 62; }
+	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
+	goto _again;
+f26:
+#line 225 "ejson.rl"
+	{ b64_cnt = 3; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 218 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
 	goto _again;
 f24:
-#line 223 "ejson.rl"
+#line 225 "ejson.rl"
 	{ b64_cnt = 3; }
-#line 148 "ejson.rl"
+#line 150 "ejson.rl"
 	{
 			if (base64_hold + b64_cnt >= 128) {
 				if (d->add_data)
@@ -2519,15 +2528,15 @@ f24:
 			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-#line 234 "ejson.rl"
+#line 236 "ejson.rl"
 	{b64 = 0;}
-#line 218 "ejson.rl"
-	{ b64 = (b64 << 6) | 63; }
+#line 219 "ejson.rl"
+	{ b64 = (b64 << 6) | 62; }
 	goto _again;
-f32:
-#line 228 "ejson.rl"
-	{ b64_cnt = 2; }
-#line 148 "ejson.rl"
+f25:
+#line 225 "ejson.rl"
+	{ b64_cnt = 3; }
+#line 150 "ejson.rl"
 	{
 			if (base64_hold + b64_cnt >= 128) {
 				if (d->add_data)
@@ -2537,15 +2546,15 @@ f32:
 			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-#line 234 "ejson.rl"
+#line 236 "ejson.rl"
 	{b64 = 0;}
-#line 214 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'A'); }
+#line 220 "ejson.rl"
+	{ b64 = (b64 << 6) | 63; }
 	goto _again;
 f33:
-#line 228 "ejson.rl"
+#line 230 "ejson.rl"
 	{ b64_cnt = 2; }
-#line 148 "ejson.rl"
+#line 150 "ejson.rl"
 	{
 			if (base64_hold + b64_cnt >= 128) {
 				if (d->add_data)
@@ -2555,87 +2564,15 @@ f33:
 			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 215 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
-	goto _again;
-f31:
-#line 228 "ejson.rl"
-	{ b64_cnt = 2; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
+#line 236 "ejson.rl"
 	{b64 = 0;}
 #line 216 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
-	goto _again;
-f29:
-#line 228 "ejson.rl"
-	{ b64_cnt = 2; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 217 "ejson.rl"
-	{ b64 = (b64 << 6) | 62; }
-	goto _again;
-f30:
-#line 228 "ejson.rl"
-	{ b64_cnt = 2; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 218 "ejson.rl"
-	{ b64 = (b64 << 6) | 63; }
-	goto _again;
-f38:
-#line 230 "ejson.rl"
-	{ b64_cnt = 1; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 214 "ejson.rl"
 	{ b64 = (b64 << 6) | ((*p) - 'A'); }
 	goto _again;
-f39:
+f34:
 #line 230 "ejson.rl"
-	{ b64_cnt = 1; }
-#line 148 "ejson.rl"
+	{ b64_cnt = 2; }
+#line 150 "ejson.rl"
 	{
 			if (base64_hold + b64_cnt >= 128) {
 				if (d->add_data)
@@ -2645,51 +2582,15 @@ f39:
 			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 215 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
-	goto _again;
-f37:
-#line 230 "ejson.rl"
-	{ b64_cnt = 1; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
-	{b64 = 0;}
-#line 216 "ejson.rl"
-	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
-	goto _again;
-f35:
-#line 230 "ejson.rl"
-	{ b64_cnt = 1; }
-#line 148 "ejson.rl"
-	{
-			if (base64_hold + b64_cnt >= 128) {
-				if (d->add_data)
-					d->add_data(d, base64, base64_hold);
-				base64_hold = 0;
-			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
-		}
-#line 234 "ejson.rl"
+#line 236 "ejson.rl"
 	{b64 = 0;}
 #line 217 "ejson.rl"
-	{ b64 = (b64 << 6) | 62; }
+	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
 	goto _again;
-f36:
+f32:
 #line 230 "ejson.rl"
-	{ b64_cnt = 1; }
-#line 148 "ejson.rl"
+	{ b64_cnt = 2; }
+#line 150 "ejson.rl"
 	{
 			if (base64_hold + b64_cnt >= 128) {
 				if (d->add_data)
@@ -2699,10 +2600,156 @@ f36:
 			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-#line 234 "ejson.rl"
+#line 236 "ejson.rl"
 	{b64 = 0;}
 #line 218 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
+	goto _again;
+f30:
+#line 230 "ejson.rl"
+	{ b64_cnt = 2; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 219 "ejson.rl"
+	{ b64 = (b64 << 6) | 62; }
+	goto _again;
+f31:
+#line 230 "ejson.rl"
+	{ b64_cnt = 2; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 220 "ejson.rl"
 	{ b64 = (b64 << 6) | 63; }
+	goto _again;
+f39:
+#line 232 "ejson.rl"
+	{ b64_cnt = 1; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 216 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - 'A'); }
+	goto _again;
+f40:
+#line 232 "ejson.rl"
+	{ b64_cnt = 1; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 217 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - 'a' + 26 ); }
+	goto _again;
+f38:
+#line 232 "ejson.rl"
+	{ b64_cnt = 1; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 218 "ejson.rl"
+	{ b64 = (b64 << 6) | ((*p) - '0' + 52 ); }
+	goto _again;
+f36:
+#line 232 "ejson.rl"
+	{ b64_cnt = 1; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 219 "ejson.rl"
+	{ b64 = (b64 << 6) | 62; }
+	goto _again;
+f37:
+#line 232 "ejson.rl"
+	{ b64_cnt = 1; }
+#line 150 "ejson.rl"
+	{
+			if (base64_hold + b64_cnt >= 128) {
+				if (d->add_data)
+					d->add_data(d, base64, base64_hold);
+				base64_hold = 0;
+			}
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+				base64[base64_hold++] = (b64 >> s) & 0xff;
+		}
+#line 236 "ejson.rl"
+	{b64 = 0;}
+#line 220 "ejson.rl"
+	{ b64 = (b64 << 6) | 63; }
+	goto _again;
+f3:
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+#line 181 "ejson.rl"
+	{ v.u.v_int = 0; integer_sign = 1; }
+#line 182 "ejson.rl"
+	{ integer_sign = -1; }
+#line 203 "ejson.rl"
+	{ float_start = p; }
+	goto _again;
+f5:
+#line 253 "ejson.rl"
+	{ _value_start = p; }
+#line 181 "ejson.rl"
+	{ v.u.v_int = 0; integer_sign = 1; }
+#line 183 "ejson.rl"
+	{ v.u.v_int = (v.u.v_int * 10) + ((*p) - '0'); }
+#line 203 "ejson.rl"
+	{ float_start = p; }
 	goto _again;
 
 _again:
@@ -2714,64 +2761,64 @@ _again:
 	if ( p == eof )
 	{
 	switch ( _ejson_eof_actions[cs] ) {
-	case 48:
-#line 132 "ejson.rl"
+	case 49:
+#line 134 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_string, &v); }
 	break;
-	case 62:
-#line 136 "ejson.rl"
+	case 63:
+#line 138 "ejson.rl"
 	{ v.u.v_bool = 1; d->set_value(d, ejson_driver_type_bool, &v); }
 	break;
-	case 58:
-#line 137 "ejson.rl"
+	case 59:
+#line 139 "ejson.rl"
 	{ v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
 	break;
-	case 60:
-#line 138 "ejson.rl"
+	case 61:
+#line 140 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_null, NULL); }
 	break;
-	case 50:
-#line 157 "ejson.rl"
+	case 51:
+#line 159 "ejson.rl"
 	{ 
 			if (base64_hold && d->add_data)
 				d->add_data(d, base64, base64_hold);
 			if (d->close_data) d->close_data(d);
 		}
 	break;
-	case 22:
-#line 235 "ejson.rl"
+	case 23:
+#line 237 "ejson.rl"
 	{ printf("### base64 Error : '%s'\n", p); }
 	break;
-	case 47:
-#line 252 "ejson.rl"
-	{ printf("### Value[%d] Error : '%s'\n", top, p); }
+	case 48:
+#line 254 "ejson.rl"
+	{ printf("### Value[%d] Error : '%s'\n", top, _value_start); }
 	break;
-	case 54:
-#line 182 "ejson.rl"
-	{  v.u.v_int *= integer_sign; }
-#line 133 "ejson.rl"
-	{ d->set_value(d, ejson_driver_type_integer, &v); }
-	break;
-	case 56:
-#line 182 "ejson.rl"
+	case 55:
+#line 184 "ejson.rl"
 	{  v.u.v_int *= integer_sign; }
 #line 135 "ejson.rl"
+	{ d->set_value(d, ejson_driver_type_integer, &v); }
+	break;
+	case 57:
+#line 184 "ejson.rl"
+	{  v.u.v_int *= integer_sign; }
+#line 137 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_hex, &v); }
 	break;
-	case 52:
-#line 202 "ejson.rl"
+	case 53:
+#line 204 "ejson.rl"
 	{ sscanf(float_start, "%lf", &v.u.v_float); }
-#line 134 "ejson.rl"
+#line 136 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_float, &v); }
 	break;
-#line 2768 "ejson.c"
+#line 2815 "ejson.c"
 	}
 	}
 
 	_out: {}
 	}
 
-#line 281 "ejson.rl"
+#line 283 "ejson.rl"
 
 	
 	return 0;
