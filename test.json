@@ -1,0 +1,19 @@
+{
+	device: {
+		type: "Orbital",
+		rows: 0x10,
+		array: [
+			"lala",
+			"lili",
+		],
+	},
+	toto: 4,
+	"other key": {
+		type: null,
+		bool: true
+	},
+	"empty array": [],
+	
+	data : %WW91IGNhbiBlaXRoZXIgdXBsb2FkIGEgZmlsZSB1c2luZyB0aGUgJ0Jyb3dzZScgY29udHJvbCBiZWxvdy4=%
+}
+
