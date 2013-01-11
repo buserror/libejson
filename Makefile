@@ -8,17 +8,18 @@ SOV				= 1
 VERSION			= 0.90
 PKG				= 1
 
+TARGET			= libejson
+DESC			= JSON and EJSON C parser library
+
 O				:= ..
 ARCH			:= $(shell $(CC) -dumpmachine)
 BUILD			:= $(O)/build-$(ARCH)
-OBJ				:= $(BUILD)/obj
+OBJ				:= $(BUILD)/obj/$(TARGET)
 BIN				:= $(BUILD)/bin
 LIB				:= $(BUILD)/lib
 
 EXTRA_CFLAGS	+= -g -O2 -fPIC --std=gnu99
 
-TARGET			= libejson
-DESC			= JSON and EJSON C parser library
 
 all				:	$(OBJ) $(BIN) $(LIB) $(LIB)/$(TARGET).a \
 	$(LIB)/$(TARGET).so.$(SOV) \
@@ -95,10 +96,10 @@ endif
 	
 ${OBJ}/%.o: %.c
 ifeq ($(V),1)
-	${CC} -MD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<}
+	${CC} -MMD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<}
 else
 	@echo "  CC    ${<}"
-	@${CC} -MD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<} \
+	@${CC} -MMD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<} \
 		|| echo Error: ${CC} -MD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<}
 endif
 
