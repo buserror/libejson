@@ -161,10 +161,16 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 				d->add_data(d, base64, base64_hold);
 			if (d->close_data) d->close_data(d);
 		}
-		
-		W = (
-			[ \t\n]**
+		skipline := [^\n]* '\n' @{ fret; };
+		comment = '//' @{ fhold;fcall skipline ; }; 
+		WB = (
+			[ \t\n]+
 		);
+		W = (
+			WB |
+			comment
+		)*;
+		WN = [ \t\n]**;
 
 		#
 		# quoted or unquoted string
@@ -249,7 +255,8 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 			('null' %obj_set_null) |
 			('{' @{ fhold; fcall obj_field_list; } ) |
 			('[' @{ fhold; fcall ejson_value_list; } ) |
-			(('%' (W base64)* W '%') >obj_start_data %obj_end_data)
+			(('%' (W base64)* W '%') 
+				>obj_start_data %obj_end_data)
 		) >{ _value_start = p; }
 				%err{ printf("### Value[%d] Error : '%s'\n", top, _value_start); };
 		

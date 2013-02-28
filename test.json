@@ -1,16 +1,19 @@
-{
+// Some out of scope comment
+{	// some comments
 	device: {
-		type: "Orbital",
+		type: "Orbital", // can be
 		rows: 0x10,
 		array: [
 			"lala",
 			"lili",
 		],
 	},
+	// here
+	// and there
 	toto: 4,
 	"other key": {
 		type: null,
-		bool: true
+		bool: false,
 	},
 	"empty array": [],
 	
