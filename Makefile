@@ -43,7 +43,7 @@ install			:
 	$(INSTALL) -m 644 $(LIB)/$(TARGET).a $(DESTDIR)/lib/
 	$(INSTALL) -m 644 ejson.h $(DESTDIR)/include/
 	$(INSTALL) -s -m 644 $(LIB)/$(TARGET).so.$(VERSION).$(SOV) $(DESTDIR)/lib/
-	cp $(LIB)/{$(TARGET).so.$(SOV),$(TARGET).so} $(DESTDIR)/lib/
+	cp -f -d  $(LIB)/{$(TARGET).so.$(SOV),$(TARGET).so} $(DESTDIR)/lib/
 	mkdir -p $(DESTDIR)/lib/pkgconfig 
 	sed -e "s|PREFIX|$(PREFIX)|" -e "s|VERSION|$(VERSION)|" \
 		ejson.pc >$(DESTDIR)/lib/pkgconfig/ejson.pc
