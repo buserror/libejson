@@ -1451,11 +1451,14 @@ case 82:
 		case 95: goto tr261;
 		case 125: goto tr262;
 	}
-	if ( (*p) < 65 ) {
+	if ( (*p) < 48 ) {
 		if ( 9 <= (*p) && (*p) <= 10 )
 			goto tr258;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
+	} else if ( (*p) > 57 ) {
+		if ( (*p) > 90 ) {
+			if ( 97 <= (*p) && (*p) <= 122 )
+				goto tr261;
+		} else if ( (*p) >= 65 )
 			goto tr261;
 	} else
 		goto tr261;
@@ -1498,11 +1501,14 @@ case 87:
 		case 47: goto tr277;
 		case 95: goto tr278;
 	}
-	if ( (*p) < 65 ) {
+	if ( (*p) < 48 ) {
 		if ( 9 <= (*p) && (*p) <= 10 )
 			goto tr274;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
+	} else if ( (*p) > 57 ) {
+		if ( (*p) > 90 ) {
+			if ( 97 <= (*p) && (*p) <= 122 )
+				goto tr278;
+		} else if ( (*p) >= 65 )
 			goto tr278;
 	} else
 		goto tr278;
@@ -2042,11 +2048,14 @@ case 138:
 		case 47: goto tr433;
 		case 95: goto tr278;
 	}
-	if ( (*p) < 65 ) {
+	if ( (*p) < 48 ) {
 		if ( 9 <= (*p) && (*p) <= 10 )
 			goto tr287;
-	} else if ( (*p) > 90 ) {
-		if ( 97 <= (*p) && (*p) <= 122 )
+	} else if ( (*p) > 57 ) {
+		if ( (*p) > 90 ) {
+			if ( 97 <= (*p) && (*p) <= 122 )
+				goto tr278;
+		} else if ( (*p) >= 65 )
 			goto tr278;
 	} else
 		goto tr278;
@@ -3526,7 +3535,7 @@ _again:
 #line 136 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_float, &v); }
 	break;
-#line 3530 "ejson.c"
+#line 3539 "ejson.c"
 	}
 	}
 

@@ -179,7 +179,7 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		action str_done { v.u.v_str.end = fpc; }
 			
 		string = '"' ((([^"] | '\\"')**) >str_init %str_done)  '"';
-		ident = ((alpha | '_') (alnum | '_')**) >str_init %str_done;
+		ident = ((alnum | '_') (alnum | '_')**) >str_init %str_done;
 		
 		#
 		#	negative/positive Integer
