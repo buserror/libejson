@@ -8,19 +8,19 @@
  */
 /*
 	This file is part of libejson.
-	
+
 	(C) 2010 Michel Pollet <buserror@gmail.com>
-	
+
 	libejson is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-	
+
 	libejson is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with libejson.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,7 +35,7 @@
 #line 36 "ejson.c"
 static const char _ejson_str_eof_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 11, 
-	13, 15, 17, 19, 21, 23, 25
+	13, 15, 17, 19, 21, 23, 25, 0
 };
 
 static const int ejson_str_start = 6;
@@ -185,6 +185,18 @@ case 5:
 	} else
 		goto tr20;
 	goto tr10;
+case 15:
+	if ( (*p) == 92 )
+		goto tr23;
+	if ( (*p) < 65 ) {
+		if ( 48 <= (*p) && (*p) <= 57 )
+			goto tr40;
+	} else if ( (*p) > 70 ) {
+		if ( 97 <= (*p) && (*p) <= 102 )
+			goto tr42;
+	} else
+		goto tr41;
+	goto tr22;
 	}
 
 	tr10: cs = 0; goto _again;
@@ -207,9 +219,6 @@ case 5:
 	tr16: cs = 5; goto f3;
 	tr17: cs = 5; goto f4;
 	tr18: cs = 5; goto f5;
-	tr19: cs = 6; goto f6;
-	tr20: cs = 6; goto f7;
-	tr21: cs = 6; goto f8;
 	tr22: cs = 6; goto f9;
 	tr24: cs = 6; goto f11;
 	tr26: cs = 6; goto f13;
@@ -227,6 +236,12 @@ case 5:
 	tr5: cs = 12; goto _again;
 	tr6: cs = 13; goto _again;
 	tr7: cs = 14; goto _again;
+	tr19: cs = 15; goto f6;
+	tr20: cs = 15; goto f7;
+	tr21: cs = 15; goto f8;
+	tr40: cs = 15; goto f26;
+	tr41: cs = 15; goto f27;
+	tr42: cs = 15; goto f28;
 
 f3:
 #line 74 "ejson.rl"
@@ -356,6 +371,30 @@ f11:
 #line 80 "ejson.rl"
 	{*out++ = (*p);}
 	goto _again;
+f26:
+#line 74 "ejson.rl"
+	{ u = (u << 4) | ((*p) - '0'); }
+#line 78 "ejson.rl"
+	{ out = ejson_append_utf8_glyph(out, u); }
+#line 80 "ejson.rl"
+	{*out++ = (*p);}
+	goto _again;
+f28:
+#line 75 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'a' + 0xa); }
+#line 78 "ejson.rl"
+	{ out = ejson_append_utf8_glyph(out, u); }
+#line 80 "ejson.rl"
+	{*out++ = (*p);}
+	goto _again;
+f27:
+#line 76 "ejson.rl"
+	{ u = (u << 4) | ((*p) - 'A' + 0xa); }
+#line 78 "ejson.rl"
+	{ out = ejson_append_utf8_glyph(out, u); }
+#line 80 "ejson.rl"
+	{*out++ = (*p);}
+	goto _again;
 f23:
 #line 88 "ejson.rl"
 	{ *out++ = '\r'; }
@@ -408,7 +447,7 @@ _again:
 #line 90 "ejson.rl"
 	{*out++ = (*p);}
 	break;
-#line 412 "ejson.c"
+#line 451 "ejson.c"
 	}
 	}
 
@@ -418,12 +457,12 @@ _again:
 #line 100 "ejson.rl"
 
 	*out = 0;
-	
+
 	return 0;
 }
 
 
-#line 427 "ejson.c"
+#line 466 "ejson.c"
 static const short _ejson_eof_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 24, 0, 0, 0, 24, 0, 
@@ -473,16 +512,16 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 	uint8_t * base64 = NULL;
 	int base64_hold = 0;
 	const char * _value_start = NULL;
-	
+
 	memset(&v, 0, sizeof(v));
 	
-#line 480 "ejson.c"
+#line 519 "ejson.c"
 	{
 	cs = ejson_start;
 	top = 0;
 	}
 
-#line 486 "ejson.c"
+#line 525 "ejson.c"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -2600,7 +2639,7 @@ f73:
 	goto _again;
 f63:
 #line 159 "ejson.rl"
-	{ 
+	{
 			if (base64_hold && d->add_data)
 				d->add_data(d, base64, base64_hold);
 			if (d->close_data) d->close_data(d);
@@ -2750,7 +2789,7 @@ f24:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -2764,7 +2803,7 @@ f47:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -2778,7 +2817,7 @@ f41:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -2816,7 +2855,7 @@ f1:
 #line 260 "ejson.rl"
 	{ _value_start = p; }
 #line 142 "ejson.rl"
-	{ 
+	{
 			if (d->open_data) {
 				d->open_data(d);
 				base64_hold = 0;
@@ -2915,7 +2954,7 @@ f74:
 	goto _again;
 f82:
 #line 159 "ejson.rl"
-	{ 
+	{
 			if (base64_hold && d->add_data)
 				d->add_data(d, base64, base64_hold);
 			if (d->close_data) d->close_data(d);
@@ -2927,7 +2966,7 @@ f82:
 	goto _again;
 f64:
 #line 159 "ejson.rl"
-	{ 
+	{
 			if (base64_hold && d->add_data)
 				d->add_data(d, base64, base64_hold);
 			if (d->close_data) d->close_data(d);
@@ -3017,7 +3056,7 @@ f34:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3035,7 +3074,7 @@ f35:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3053,7 +3092,7 @@ f33:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3071,7 +3110,7 @@ f31:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3089,7 +3128,7 @@ f32:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3105,7 +3144,7 @@ f28:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3123,7 +3162,7 @@ f29:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3141,7 +3180,7 @@ f27:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3159,7 +3198,7 @@ f25:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3177,7 +3216,7 @@ f26:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3195,7 +3234,7 @@ f51:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3213,7 +3252,7 @@ f52:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3231,7 +3270,7 @@ f50:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3249,7 +3288,7 @@ f48:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3267,7 +3306,7 @@ f49:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3285,7 +3324,7 @@ f45:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3303,7 +3342,7 @@ f46:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3321,7 +3360,7 @@ f44:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3339,7 +3378,7 @@ f42:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3357,7 +3396,7 @@ f43:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 #line 242 "ejson.rl"
@@ -3379,7 +3418,7 @@ f39:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -3397,7 +3436,7 @@ f40:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -3415,7 +3454,7 @@ f38:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -3433,7 +3472,7 @@ f36:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -3451,7 +3490,7 @@ f37:
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
+			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
 				base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 	goto _again;
@@ -3503,7 +3542,7 @@ _again:
 	break;
 	case 64:
 #line 159 "ejson.rl"
-	{ 
+	{
 			if (base64_hold && d->add_data)
 				d->add_data(d, base64, base64_hold);
 			if (d->close_data) d->close_data(d);
@@ -3535,7 +3574,7 @@ _again:
 #line 136 "ejson.rl"
 	{ d->set_value(d, ejson_driver_type_float, &v); }
 	break;
-#line 3539 "ejson.c"
+#line 3578 "ejson.c"
 	}
 	}
 
@@ -3544,7 +3583,7 @@ _again:
 
 #line 290 "ejson.rl"
 
-	
+
 	return 0;
 };
 
