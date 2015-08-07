@@ -11,6 +11,8 @@
 	// here
 	// and there
 	toto: 4,
+	floaty: 10.5,
+	expo: 5e-3,
 	"other key": {
 		type: null,
 		bool: false,

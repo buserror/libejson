@@ -112,9 +112,10 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 {
 	const char *p = str, *pe = str + strlen( str ), *eof = pe;
 	int cs;
-	int stack[48], top = 0;
+	int *stack = NULL, stack_size = 0, top = 0;
 	int integer_sign = 0;	// for integer decode
 	const char * float_start = NULL;
+	char float_value[32];
 	ejson_driver_value_t v; // = {0};
 	uint32_t b64 = 0;
 	int b64_cnt = 0;
@@ -139,6 +140,13 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		action obj_set_false { v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
 		action obj_set_null { d->set_value(d, ejson_driver_type_null, NULL); }
 
+		prepush {
+			// prepush thing
+			if (top == stack_size) {
+				stack_size += 8;
+				stack = realloc(stack, stack_size * sizeof(int));
+			}
+		}
 		action obj_start_data {
 			if (d->open_data) {
 				d->open_data(d);
@@ -153,8 +161,9 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
-				base64[base64_hold++] = (b64 >> s) & 0xff;
+			if (base64)
+				for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
+					base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
 		action obj_end_data {
 			if (base64_hold && d->add_data)
@@ -207,12 +216,28 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		# float/double value
 		#
 		action float_init { float_start = fpc; }
-		action float_done { sscanf(float_start, "%lf", &v.u.v_float); }
+		action float_done { 
+			int l = fpc - float_start;
+			if (l >= sizeof(float_value)) {
+				l = sizeof(float_value)-1;
+			}
+			memcpy(float_value, float_start, l);
+			float_value[l] = 0;
+			double lf = 0.0d; 
+			sscanf(float_value, "%lg", &lf); 
+			v.u.v_float = lf;
+			float_start = NULL;
+		}
 		#
 		# float values
-		#
+		# Handle exponential notation. Not JSON, but javascript does it.
+		# Also allows specifying for example 5f for a float value of 5
 		float = (
-			('-' | '+')? digit* '.' digit+ [fd]?
+			('-' | '+')? (
+				(digit+ ('f'|'d')?) | 
+				(digit* ('.' digit+)) | 
+				(digit+ ('.' digit+)? ('e' ('-')? digit+))
+			)
 		) >float_init %float_done;
 
 		#
@@ -288,7 +313,7 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		write init;
 		write exec;
 	}%%
-
+	if (stack) free(stack);
 	return 0;
 };
 
