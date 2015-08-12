@@ -234,7 +234,7 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		# Also allows specifying for example 5f for a float value of 5
 		float = (
 			('-' | '+')? (
-				(digit+ ('f'|'d')?) | 
+			#	(digit+ ('f'|'d')?) | 
 				(digit* ('.' digit+)) | 
 				(digit+ ('.' digit+)? ('e' ('-')? digit+))
 			)
