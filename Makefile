@@ -18,8 +18,8 @@ OBJ				:= $(BUILD)/obj/$(TARGET)
 BIN				:= $(BUILD)/bin
 LIB				:= $(BUILD)/lib
 
-EXTRA_CFLAGS	+= -g -O2 -fPIC --std=gnu99
-
+EXTRA_CFLAGS	+= $(CFLAGS) -Wno-error=unused-variable \
+					-g -O2 -fPIC --std=gnu99 
 
 all				:	$(OBJ) $(BIN) $(LIB) \
 	$(LIB)/$(TARGET).a shared

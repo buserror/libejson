@@ -223,7 +223,7 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 			}
 			memcpy(float_value, float_start, l);
 			float_value[l] = 0;
-			double lf = 0.0d; 
+			double lf = 0.0; 
 			sscanf(float_value, "%lg", &lf); 
 			v.u.v_float = lf;
 			float_start = NULL;
