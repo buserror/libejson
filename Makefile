@@ -9,16 +9,17 @@ VERSION			= 0.90
 PKG				= 1
 
 TARGET			= libejson
-DESC			= JSON and EJSON C parser library
+DESC				= JSON and EJSON C parser library
 
 O				:= ..
-ARCH			:= $(shell $(CC) -dumpmachine)
+ARCH				:= $(shell $(CC) -dumpmachine)
 BUILD			:= $(O)/build-$(ARCH)
 OBJ				:= $(BUILD)/obj/$(TARGET)
 BIN				:= $(BUILD)/bin
 LIB				:= $(BUILD)/lib
 
-EXTRA_CFLAGS	+= $(CFLAGS) -Wno-error=unused-variable \
+EXTRA_CFLAGS	+= -Wno-error=unused-variable \
+					-Wno-error=unused-const-variable \
 					-g -O2 -fPIC --std=gnu99 
 
 all				:	$(OBJ) $(BIN) $(LIB) \
@@ -113,10 +114,10 @@ endif
 
 ${OBJ}/%.o: %.c
 ifeq ($(V),1)
-	${CC} -MMD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<}
+	${CC} -MMD ${CPPFLAGS} ${CFLAGS} ${EXTRA_CFLAGS} -c -o ${@} ${<}
 else
 	@echo "  CC    ${<}"
-	@${CC} -MMD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<} \
+	@${CC} -MMD ${CPPFLAGS} ${CFLAGS} ${EXTRA_CFLAGS} -c -o ${@} ${<} \
 		|| echo Error: ${CC} -MD ${EXTRA_CFLAGS} ${CPPFLAGS} ${CFLAGS} -c -o ${@} ${<}
 endif
 
