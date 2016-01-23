@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="1038.32">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 10.0px Helvetica}
+    span.Apple-tab-span {white-space:pre}
+  </style>
+</head>
+<body>
+<p class="p1">libejson, © Michel Pollet &lt;buserror@gmail.com&gt;</p>
+<p class="p1"><a href="http://gitorious.org/libejson">http://gitorious.org/libejson</a></p>
+<p class="p2"><br></p>
+<p class="p1">libejson is a library designed to parse JSON text (http://json.org/), as well as EJSON, an "extended" version of JSON that was designed to be more friendly for settings files, storage, and other uses like human interface description files.</p>
+<p class="p2"><br></p>
+<p class="p1">libejson uses a simple "driver" (collection of callbacks) system, it parses the input and repeatedly calls your callbacks; your code is responsible for storing, allocating and generally "do stuff" with the parsed data.</p>
+<p class="p2"><br></p>
+<p class="p1">libejson doesn't allocate memory generally, it will allocate a 128 byte buffer on the stack if it decodes base64 data (see below), otherwise it's footprint is minimal.</p>
+<p class="p2"><br></p>
+<p class="p1">"Extended" JSON implements these extensions:</p>
+<p class="p2"><br></p>
+<p class="p1"><b>EJSON makes quoting node identifiers optional, if they don't contain spaces.</b></p>
+<p class="p1">Normal JSON forces you to use syntax like '<i>{ "hello" : "world" }</i>' in EJSON, you can use '<i>{ hello : "world" }</i>'. This makes it easier to read/edit settings files by hand.</p>
+<p class="p1"><b>EJSON nodes can have flags/attributes</b></p>
+<p class="p1">You can specify a list of words as a node "attribute". This allows flags to be passed to the host program for this particular node. It's especially important for files that describe human interface, or to allow easier debugging in some cases.</p>
+<p class="p1">Syntax Example: <i>{ node_label (visible, translated) : "Bonjour" }</i></p>
+<p class="p1"><b>EJSON explicitly allows trailing comma in lists</b></p>
+<p class="p1">JSON does not allow trailing comma in lists, which makes code that generate JSON more complicated for no reason, and also makes "patching" JSON files more difficult. EJSON allows trailing commas in objects and arrays.<span class="Apple-converted-space"> </span></p>
+<p class="p1">Syntax Example: <i>[0,1,2,]</i></p>
+<p class="p1"><b>EJSON allows binary data values</b></p>
+<p class="p1">You can have arbitrary binary data in nodes, encoded in base64. This is often very useful to store small pieces of binary, small images, or other things embedded in a bigger file. The base64 values are delimited by % (percent) characters.</p>
+<p class="p1">Syntax Example: <i>{ node : % WW91IGNhbiBlaXRoZXIgdXBsb2FkIGEgZmlsZ== % }</i></p>
+<p class="p1"><b>EJSON allows hexadecimal integer constants</b></p>
+<p class="p1">hex constants are essential for files edited by hand.</p>
+<p class="p1">Syntax Example: <i>{ node : 0xdeadbeef }</i></p>
+<p class="p2"><br></p>
+<p class="p1">Example:</p>
+<p class="p3">{</p>
+<p class="p3"><span class="Apple-tab-span">	</span>device : [</p>
+<p class="p3"><span class="Apple-tab-span">	</span>{</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>name :<span class="Apple-converted-space">  </span>"Keyboard",</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>label (visible) : "105 keys keyboard",</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>flags : 0xcafef00d,</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>icon : %</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>RGVjb2RlIGJhc2U2NCBzdHJpbmdzIChiYXNlNjQgc3RyaW5nIGxvb2tzIGxpa2UgWVRNME5ab21J</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>ekkyT1RzbUl6TTBOVHVlWVE9PSkNCkRlY29kZSBhIGJhc2U2NCBlbmNvZGVkIGZpbGUgKGZvciBl</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>eGFtcGxlIElDTyBmaWxlcyBvciBmaWxlcyBmcm9tIE1JTUUgbWVzc2FnZSkNCkNvbnZlcnQgc291</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>cmNlIHRleHQgZGF0YSBmcm9tIHNldmVyYWwgY29kZSBwYQ== %</p>
+<p class="p3"><span class="Apple-tab-span">	</span>},</p>
+<p class="p3"><span class="Apple-tab-span">	</span>]</p>
+<p class="p3">}</p>
+</body>
+</html>

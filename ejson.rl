@@ -6,19 +6,19 @@
  */
 /*
 	This file is part of libejson.
-	
+
 	(C) 2010 Michel Pollet <buserror@gmail.com>
-	
+
 	libejson is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-	
+
 	libejson is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Lesser General Public License for more details.
-	
+
 	You should have received a copy of the GNU Lesser General Public License
 	along with libejson.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -73,12 +73,12 @@ int ejson_parse_string(const char * str, const char *end, char * out)
 		xxdigit = (
 			([0-9] @{ u = (u << 4) | (fc - '0'); }) |
 			([a-f] @{ u = (u << 4) | (fc - 'a' + 0xa); }) |
-			([A-F] @{ u = (u << 4) | (fc - 'A' + 0xa); })			
+			([A-F] @{ u = (u << 4) | (fc - 'A' + 0xa); })
 		);
-		utf16 = ( xxdigit{4} ) >{ u = 0; } @{ out = ejson_append_utf8_glyph(out, u); };
-		
+		utf16 = ( xxdigit{4,} ) >{ u = 0; } @{ out = ejson_append_utf8_glyph(out, u); };
+
 		normal = any @{*out++ = fc;};
-		escape = 
+		escape =
 				('"' %{ *out++ = '"'; } ) |
 				('\\' %{ *out++ = '\\'; } ) |
 				('t' %{ *out++ = '\t'; } )  |
@@ -93,13 +93,13 @@ int ejson_parse_string(const char * str, const char *end, char * out)
 			('\\' escape) |
 			( normal -- '\\' )
 		)*;
-		
+
 		# Initialize and execute.
 		write init;
 		write exec;
 	}%%
 	*out = 0;
-	
+
 	return 0;
 }
 
@@ -112,16 +112,17 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 {
 	const char *p = str, *pe = str + strlen( str ), *eof = pe;
 	int cs;
-	int stack[48], top = 0;
+	int *stack = NULL, stack_size = 0, top = 0;
 	int integer_sign = 0;	// for integer decode
 	const char * float_start = NULL;
+	char float_value[32];
 	ejson_driver_value_t v; // = {0};
 	uint32_t b64 = 0;
 	int b64_cnt = 0;
 	uint8_t * base64 = NULL;
 	int base64_hold = 0;
 	const char * _value_start = NULL;
-	
+
 	memset(&v, 0, sizeof(v));
 	%%{
 		machine ejson;
@@ -138,8 +139,15 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		action obj_set_true { v.u.v_bool = 1; d->set_value(d, ejson_driver_type_bool, &v); }
 		action obj_set_false { v.u.v_bool = 0; d->set_value(d, ejson_driver_type_bool, &v); }
 		action obj_set_null { d->set_value(d, ejson_driver_type_null, NULL); }
-		
-		action obj_start_data { 
+
+		prepush {
+			// prepush thing
+			if (top == stack_size) {
+				stack_size += 8;
+				stack = realloc(stack, stack_size * sizeof(int));
+			}
+		}
+		action obj_start_data {
 			if (d->open_data) {
 				d->open_data(d);
 				base64_hold = 0;
@@ -153,28 +161,35 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 					d->add_data(d, base64, base64_hold);
 				base64_hold = 0;
 			}
-			for (int s=16, i = 0; i < b64_cnt; i++, s-=8) 
-				base64[base64_hold++] = (b64 >> s) & 0xff;
+			if (base64)
+				for (int s=16, i = 0; i < b64_cnt; i++, s-=8)
+					base64[base64_hold++] = (b64 >> s) & 0xff;
 		}
-		action obj_end_data { 
+		action obj_end_data {
 			if (base64_hold && d->add_data)
 				d->add_data(d, base64, base64_hold);
 			if (d->close_data) d->close_data(d);
 		}
-		
-		W = (
-			[ \t\n]**
+		skipline := [^\n]* '\n' @{ fret; };
+		comment = '//' @{ fhold;fcall skipline ; };
+		WB = (
+			[ \t\n]+
 		);
+		W = (
+			WB |
+			comment
+		)*;
+		WN = [ \t\n]**;
 
 		#
 		# quoted or unquoted string
 		#
 		action str_init { v.u.v_str.start = v.u.v_str.end = fpc; }
 		action str_done { v.u.v_str.end = fpc; }
-			
+
 		string = '"' ((([^"] | '\\"')**) >str_init %str_done)  '"';
-		ident = ((alpha | '_') (alnum | '_')**) >str_init %str_done;
-		
+		ident = ((alnum | '_') (alnum | '_')**) >str_init %str_done;
+
 		#
 		#	negative/positive Integer
 		#
@@ -182,31 +197,47 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		action integer_minus { integer_sign = -1; }
 		action integer_digit { v.u.v_int = (v.u.v_int * 10) + (fc - '0'); }
 		action integer_done {  v.u.v_int *= integer_sign; }
-		
-		integer = (('-' @integer_minus | '+')? (digit+ @integer_digit)) 
+
+		integer = (('-' @integer_minus | '+')? (digit+ @integer_digit))
 			>integer_init %integer_done;
-		
+
 		#
 		# hex integer
 		#
 		xxdigit = (
 			([0-9] @{ v.u.v_int = (v.u.v_int << 4) | (fc - '0'); }) |
 			([a-f] @{ v.u.v_int = (v.u.v_int << 4) | (fc - 'a' + 0xa); }) |
-			([A-F] @{ v.u.v_int = (v.u.v_int << 4) | (fc - 'A' + 0xa); })			
+			([A-F] @{ v.u.v_int = (v.u.v_int << 4) | (fc - 'A' + 0xa); })
 		);
 		hex = (('-' @integer_minus | '+')?( '0x' xxdigit+))
 			>integer_init %integer_done;
-		
+
 		#
 		# float/double value
 		#
 		action float_init { float_start = fpc; }
-		action float_done { sscanf(float_start, "%lf", &v.u.v_float); }
+		action float_done { 
+			int l = fpc - float_start;
+			if (l >= sizeof(float_value)) {
+				l = sizeof(float_value)-1;
+			}
+			memcpy(float_value, float_start, l);
+			float_value[l] = 0;
+			double lf = 0.0; 
+			sscanf(float_value, "%lg", &lf); 
+			v.u.v_float = lf;
+			float_start = NULL;
+		}
 		#
 		# float values
-		#
+		# Handle exponential notation. Not JSON, but javascript does it.
+		# Also allows specifying for example 5f for a float value of 5
 		float = (
-			('-' | '+')? digit* '.' digit+ [fd]?
+			('-' | '+')? (
+			#	(digit+ ('f'|'d')?) | 
+				(digit* ('.' digit+)) | 
+				(digit+ ('.' digit+)? ('e' ('-')? digit+))
+			)
 		) >float_init %float_done;
 
 		#
@@ -226,14 +257,14 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		base64_padder = (
 			base64_char base64_char
 			(
-				(( base64_char base64_pad ) 
+				(( base64_char base64_pad )
 					%{ b64_cnt = 2; } ) |
-				(( base64_pad base64_pad ) 
+				(( base64_pad base64_pad )
 					%{ b64_cnt = 1; } )
 			)
 		) %obj_flush_data;
 
-		base64 = ( base64_four** (base64_four | base64_padder) ) >{b64 = 0;} 
+		base64 = ( base64_four** (base64_four | base64_padder) ) >{b64 = 0;}
 				%err{ printf("### base64 Error : '%s'\n", p); };
 
 		#
@@ -249,30 +280,31 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 			('null' %obj_set_null) |
 			('{' @{ fhold; fcall obj_field_list; } ) |
 			('[' @{ fhold; fcall ejson_value_list; } ) |
-			(('%' (W base64)* W '%') >obj_start_data %obj_end_data)
+			(('%' (W base64)* W '%')
+				>obj_start_data %obj_end_data)
 		) >{ _value_start = p; }
 				%err{ printf("### Value[%d] Error : '%s'\n", top, _value_start); };
-		
+
 		ejson_value_list := (
 			'[' W
 				( W (ejson_value (W ',' W ejson_value)* ) W ','? )?
 			W ']'
-		) >obj_value_list_start @obj_value_list_done @{ fret; } 
+		) >obj_value_list_start @obj_value_list_done @{ fret; }
 				%err{ printf("### Array[%d] Error : '%s'\n", top, p); };
-		
+
 		obj_field_flag = ( ident ) %obj_set_flag;
 		obj_field_flags = (
 			'(' W obj_field_flag (W ',' W obj_field_flag)* W  ','? W ')'
 		);
 		obj_field = ((string | ident) %obj_create_name) W obj_field_flags? W ':' W ejson_value;
-		
+
 		obj_field_list := (
 			'{' W
 				( W (obj_field (W ',' W obj_field)** ) W ','? )?
 			 W '}'
 		) >obj_field_list_start @obj_field_list_done @{ fret; }
 				%err{ printf("### Object[%d] Error : '%s'\n", top, p); };
-		
+
 		main := (
 			W ejson_value W
 		) %err{ printf("### ejson Error : '%s'\n", p); };
@@ -281,7 +313,7 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		write init;
 		write exec;
 	}%%
-	
+	if (stack) free(stack);
 	return 0;
 };
 

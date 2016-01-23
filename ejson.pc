@@ -1,11 +1,11 @@
 ejson.pc:
-prefix=/usr
+prefix=PREFIX
 exec_prefix=${prefix}
 includedir=${prefix}/include
 libdir=${exec_prefix}/lib
 
 Name: libejson
 Description: Library to parse JSON text (http://json.org/), as well as EJSON
-Version: 0.90
+Version: VERSION
 Cflags: -I${includedir}
 Libs: -L${libdir} -lejson
