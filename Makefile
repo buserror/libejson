@@ -18,9 +18,14 @@ OBJ				:= $(BUILD)/obj/$(TARGET)
 BIN				:= $(BUILD)/bin
 LIB				:= $(BUILD)/lib
 
-EXTRA_CFLAGS	+= -Wno-error=unused-variable \
-					-Wno-error=unused-const-variable \
-					-g -O2 -fPIC --std=gnu99 
+# stupid new warnings/errors
+GCCV6 			:= $(shell expr `$(CC) -dumpversion | cut -f1 -d.` \>= 6)
+
+ifeq "$(GCCV6)" "1"
+EXTRA_CFLAGS		+= -Wno-error=unused-variable
+EXTRA_CFLAGS		+= -Wno-error=unused-const-variable
+endif
+EXTRA_CFLAGS		+= -g -O2 -fPIC --std=gnu99 
 
 all				:	$(OBJ) $(BIN) $(LIB) \
 	$(LIB)/$(TARGET).a shared
