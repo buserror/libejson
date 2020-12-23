@@ -2,19 +2,6 @@
 	This file is part of libejson.
 	
 	(C) 2010 Michel Pollet <buserror@gmail.com>
-	
-	libejson is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-	
-	libejson is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-	
-	You should have received a copy of the GNU Lesser General Public License
-	along with libejson.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef __EJSON_H__
@@ -26,7 +13,7 @@
 extern "C" {
 #endif
 
-/*
+/*!
  * These are passed as argument to ejson_driver_t set_value()
  */
 enum {
@@ -39,7 +26,25 @@ enum {
 };
 
 /*
- * JSON value, works in pair with the enum, passed as argument
+ * Returned by the parser if the stack is a fixed stack, and we
+ * run out of space (the JSON depth is too deep
+ */
+enum {
+	EJSON_ERR_NOSTACK = -1969,
+	EJSON_ERR_BASE64,
+	EJSON_ERR_VALUE,
+	EJSON_ERR_VALUE_LIST,
+	EJSON_ERR_VALUE_OBJECT,
+	EJSON_ERR,
+};
+
+/*!
+ * JSON value. works in pair with the ejson_driver_type_XX enum,
+ * passed as argument to set_name() and set_value().
+ *
+ * Note that since the library tries really hard not to allocate
+ * memory, the v_str for the string value if defined by start and
+ * end pointer *straight* into the source JSON, no duplication is made.
  */
 typedef struct ejson_driver_value_t {
 	union {
@@ -50,17 +55,17 @@ typedef struct ejson_driver_value_t {
 	} u;
 } ejson_driver_value_t;
 
-/*
+/*!
  * JSON decoder driver structure. You need to declare one of these
- * staticaly and pass it to the decoder/parser. these callbacks
- * allows the user to allocate and populate its own data format
- * to map it to the JSON structure
+ * statically and pass it to the decoder/parser. these callbacks
+ * allows the user of the library to allocate and populate its own
+ * data format to map it to the JSON structure
  */
 typedef struct ejson_driver_t {
 	void * refcon; // yours to use, not used by the parser
 	
 	/*
-	 * called optionaly before the value is set. This is called
+	 * called optionally before the value is set. This is called
 	 * for objects that have a name, ie { "a" : 4 }.
 	 * this is /not/ called for objects in an array
 	 */
@@ -68,17 +73,17 @@ typedef struct ejson_driver_t {
 		ejson_driver_value_t * v);
 
 	/*
-	 * Called when an array is opened
+	 * Called when a JSON array is opened
 	 */
 	void (*open_array)(struct ejson_driver_t *d);
 	/*
-	 * Called when an object is opened
+	 * Called when a JSON object is opened
 	 */
 	void (*open_object)(struct ejson_driver_t *d);
 
 	/*
 	 * Allocate and set the value for a node.
-	 * set_name() already had been called for a named node
+	 * set_name() will already have been called for a named node
 	 */
 	void (*set_value)(struct ejson_driver_t *d, 
 		int type, 
@@ -114,22 +119,61 @@ typedef struct ejson_driver_t {
 	 */
 	void (*open_data)(struct ejson_driver_t *d);
 	void (*add_data)(struct ejson_driver_t *d, uint8_t * data, size_t size);
-	void (*close_data)(struct ejson_driver_t *d);	
+	void (*close_data)(struct ejson_driver_t *d);
+
+	/*
+	 * Some platforms do not want to use malloc/realloc/free, give them
+	 * a way to allocate give the parser a stack without hard coding the
+	 * limits in the library.
+	 * 'size' is in sizeof(int), not in bytes.
+	 * Note: realloc_stack will be called *at least* once. dealloc_stack
+	 *       will be called only once at the end of parsing.
+	 */
+	int * (*realloc_stack)(struct ejson_driver_t *d, int * stack, int size);
+	int * (*dealloc_stack)(struct ejson_driver_t *d, int * stack);
+
+	void (*error)(void *refcon, int err, const char * where);
 } ejson_driver_t;
 
-/*
+/*!
  * parses 'str', calls the callbacks from 'd' driver instance
+ *
+ * The parsing stack is dynamically allocated, so will allow parsing
+ * any depth of JSON objects.
  */
-int ejson_parse( ejson_driver_t *d, const char * str );
+int
+ejson_parse(
+		ejson_driver_t *d,
+		const char *str);
 
-/*
+/*!
+ * This will parse 'str', calls the driver 'd'.
+ *
+ * if 'stack' is NULL, the stack will be allocated on the fly
+ */
+int
+ejson_parse_full(
+		ejson_driver_t *d,
+		const char *str,
+		int * stack,
+		int stack_size);
+
+/*!
  * parses a string containing \b\t\n'r etc, also converts \uXXXX to UTF8
- * returns the length of the destination string, which /might/.
+ * returns the length of the destination string.
+ *
  * Note that the destination string /can/ be the source string, as it will
  * always be shorter than the source string.
- * if src == dst on entry, the source string will be clobbered.
+ *
+ * if src == dst on entry, the source string will be clobbered, this
+ * Implicitly means that the 'const' on the 'str' parameter is for
+ * convenience only.
  */
-int ejson_parse_string(const char * str, const char *end, char * out);
+int
+ejson_parse_string(
+		const char *str,
+		const char *end,
+		char * out);
 
 #ifdef __cplusplus
 };

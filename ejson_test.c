@@ -120,7 +120,6 @@ ejson_driver_t driver = {
 
 int main(int argc, char * argv[])
 {
-
 	for (int i = 1; i < argc; i++) {
 		if (!strcmp(argv[i], "-i")) {
 			char * load = malloc(32*1024);

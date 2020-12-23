@@ -8,19 +8,6 @@
 	This file is part of libejson.
 
 	(C) 2010 Michel Pollet <buserror@gmail.com>
-
-	libejson is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Lesser General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	libejson is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Lesser General Public License for more details.
-
-	You should have received a copy of the GNU Lesser General Public License
-	along with libejson.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <stdlib.h>
@@ -34,39 +21,48 @@
 	write data;
 }%%
 
-static char * ejson_append_utf8_glyph(
+/* This converts uni_glyph from a \uXXXX to a UTF8 sequence */
+static char *
+ejson_append_utf8_glyph(
 	char * dst,
-	unsigned long inUnicode )
+	uint32_t uni_glyph )
 {
-	if (!(inUnicode & ~0x7f)) {
-		*dst++ = ((char)inUnicode);
+	if (uni_glyph < 128) {
+		*dst++ = (char)uni_glyph;
 		return dst;	// that was easy
 	}
-	unsigned char *cur = (unsigned char*)dst;
+	uint8_t *cur = (uint8_t*)dst;
 
-	unsigned long currentMask = ~0x7ff;
+	uint32_t mask = ~0x7ff;
 	int bits = 6;
 	int header = 5;
 
-	while ((inUnicode & currentMask) && bits <= 24) {
-		currentMask = currentMask << 6;
+	while ((uni_glyph & mask) && bits <= 24) {
+		mask = mask << 6;
 		bits += 6; header--;
 	}
-	*cur++ = (0xfe << header) | (unsigned char)(inUnicode >> (bits));
+	*cur++ = (0xfe << header) | (uint8_t)(uni_glyph >> (bits));
 	bits -= 6;
 	while (bits >= 0) {
-		*cur++ = 0x80 | ((unsigned char)(inUnicode >> bits) & 0x3f);
+		*cur++ = 0x80 | ((uint8_t)(uni_glyph >> bits) & 0x3f);
 		bits -= 6;
 	}
 	return (char*)cur;
 }
 
-int ejson_parse_string(const char * str, const char *end, char * out)
+int
+ejson_parse_string(
+	const char *str,
+	const char *end,
+	char *out)
 {
-	const char *p = str, *pe = end ? end : str + strlen( str ), *eof = pe;
+	const char *p = str,
+			*pe = end ? end : str + strlen( str ),
+			*eof = pe;
 	int cs;
-	out = out ? out : (char*)str;
 	uint16_t u = 0;
+
+	out = out ? out : (char*)str;
 	%%{
 		machine ejson_str;
 
@@ -75,7 +71,9 @@ int ejson_parse_string(const char * str, const char *end, char * out)
 			([a-f] @{ u = (u << 4) | (fc - 'a' + 0xa); }) |
 			([A-F] @{ u = (u << 4) | (fc - 'A' + 0xa); })
 		);
-		utf16 = ( xxdigit{4,} ) >{ u = 0; } @{ out = ejson_append_utf8_glyph(out, u); };
+		utf16 = ( xxdigit{4,} ) >{ u = 0; } @{
+			out = ejson_append_utf8_glyph(out, u);
+		};
 
 		normal = any @{*out++ = fc;};
 		escape =
@@ -108,7 +106,10 @@ int ejson_parse_string(const char * str, const char *end, char * out)
 	write data;
 }%%
 
-int ejson_parse( ejson_driver_t *d, const char * str )
+int
+ejson_parse(
+	ejson_driver_t *d,
+	const char *str )
 {
 	const char *p = str, *pe = str + strlen( str ), *eof = pe;
 	int cs;
@@ -116,14 +117,14 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 	int integer_sign = 0;	// for integer decode
 	const char * float_start = NULL;
 	char float_value[32];
-	ejson_driver_value_t v; // = {0};
+	ejson_driver_value_t v = {};
 	uint32_t b64 = 0;
 	int b64_cnt = 0;
 	uint8_t * base64 = NULL;
 	int base64_hold = 0;
-	const char * _value_start = NULL;
+	const char * _value_start = NULL; /* only used as error helper */
+	int err = 0;
 
-	memset(&v, 0, sizeof(v));
 	%%{
 		machine ejson;
 		action obj_field_list_start { d->open_object(d); }
@@ -141,7 +142,7 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		action obj_set_null { d->set_value(d, ejson_driver_type_null, NULL); }
 
 		prepush {
-			// prepush thing
+			// prepush -- make sure the stack has the space for it
 			if (top == stack_size) {
 				stack_size += 8;
 				stack = realloc(stack, stack_size * sizeof(int));
@@ -187,11 +188,15 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		action str_init { v.u.v_str.start = v.u.v_str.end = fpc; }
 		action str_done { v.u.v_str.end = fpc; }
 
-		string = '"' ((([^"] | '\\"')**) >str_init %str_done)  '"';
+		dstring = '"' ((([^"] | '\\"')**) >str_init %str_done)  '"';
+		# extension to JSON: single quoted strings
+		sstring = '\'' ((([^'] | '\\\'')**) >str_init %str_done)  '\'';
+		string = ( dstring | sstring );
+
 		ident = ((alnum | '_') (alnum | '_')**) >str_init %str_done;
 
 		#
-		#	negative/positive Integer
+		# negative/positive Integer
 		#
 		action integer_init { v.u.v_int = 0; integer_sign = 1; }
 		action integer_minus { integer_sign = -1; }
@@ -216,15 +221,15 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		# float/double value
 		#
 		action float_init { float_start = fpc; }
-		action float_done { 
+		action float_done {
 			int l = fpc - float_start;
 			if (l >= sizeof(float_value)) {
 				l = sizeof(float_value)-1;
 			}
 			memcpy(float_value, float_start, l);
 			float_value[l] = 0;
-			double lf = 0.0; 
-			sscanf(float_value, "%lg", &lf); 
+			double lf = 0.0;
+			sscanf(float_value, "%lg", &lf);
 			v.u.v_float = lf;
 			float_start = NULL;
 		}
@@ -234,8 +239,8 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		# Also allows specifying for example 5f for a float value of 5
 		float = (
 			('-' | '+')? (
-			#	(digit+ ('f'|'d')?) | 
-				(digit* ('.' digit+)) | 
+			#	(digit+ ('f'|'d')?) |
+				(digit* ('.' digit+)) |
 				(digit+ ('.' digit+)? ('e' ('-')? digit+))
 			)
 		) >float_init %float_done;
@@ -265,7 +270,12 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 		) %obj_flush_data;
 
 		base64 = ( base64_four** (base64_four | base64_padder) ) >{b64 = 0;}
-				%err{ printf("### base64 Error : '%s'\n", p); };
+				%err{
+					err = EJSON_ERR_BASE64;
+					if (d->error)
+						d->error(d->refcon, err, p);
+				//	printf("### base64 Error : '%s'\n", p);
+				};
 
 		#
 		# ejson value, extended
@@ -283,14 +293,24 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 			(('%' (W base64)* W '%')
 				>obj_start_data %obj_end_data)
 		) >{ _value_start = p; }
-				%err{ printf("### Value[%d] Error : '%s'\n", top, _value_start); };
+				%err{
+					err = EJSON_ERR_VALUE;
+					if (d->error)
+						d->error(d->refcon, err, _value_start);
+				//	printf("### Value[%d] Error : '%s'\n", top, _value_start);
+				};
 
 		ejson_value_list := (
 			'[' W
 				( W (ejson_value (W ',' W ejson_value)* ) W ','? )?
 			W ']'
 		) >obj_value_list_start @obj_value_list_done @{ fret; }
-				%err{ printf("### Array[%d] Error : '%s'\n", top, p); };
+				%err{
+					err = EJSON_ERR_VALUE_LIST;
+					if (d->error)
+						d->error(d->refcon, err, p);
+				//	printf("### Array[%d] Error : '%s'\n", top, p);
+				};
 
 		obj_field_flag = ( ident ) %obj_set_flag;
 		obj_field_flags = (
@@ -303,17 +323,26 @@ int ejson_parse( ejson_driver_t *d, const char * str )
 				( W (obj_field (W ',' W obj_field)** ) W ','? )?
 			 W '}'
 		) >obj_field_list_start @obj_field_list_done @{ fret; }
-				%err{ printf("### Object[%d] Error : '%s'\n", top, p); };
+				%err{
+					err = EJSON_ERR_VALUE_OBJECT;
+					if (d->error)
+						d->error(d->refcon, err, p);
+					printf("### Object[%d] Error : '%s'\n", top, p);
+				};
 
 		main := (
 			W ejson_value W
-		) %err{ printf("### ejson Error : '%s'\n", p); };
+		) %err{
+			err = EJSON_ERR;
+			if (d->error)
+				d->error(d->refcon, err, p);
+		//	printf("### ejson Error : '%s'\n", p);
+		};
 
 		# Initialize and execute.
 		write init;
 		write exec;
 	}%%
 	if (stack) free(stack);
-	return 0;
+	return err;
 };
-

@@ -5,14 +5,14 @@ SHELL			= /bin/bash
 INSTALL			?= install
 DESTDIR			?= /usr/local
 SOV				= 1
-VERSION			= 0.90
+VERSION			= 1.2
 PKG				= 1
 
 TARGET			= libejson
 DESC				= JSON and EJSON C parser library
 
 O				:= ..
-ARCH				:= $(shell $(CC) -dumpmachine)
+ARCH			:= $(shell $(CC) -dumpmachine)
 BUILD			:= $(O)/build-$(ARCH)
 OBJ				:= $(BUILD)/obj/$(TARGET)
 BIN				:= $(BUILD)/bin
